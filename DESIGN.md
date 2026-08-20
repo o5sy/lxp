@@ -1,0 +1,74 @@
+# Design System — AI 맞춤 실습 생성기 (practice-generator)
+
+## Product Context
+- **What this is:** 부트캠프 학습자가 방금 배운 개념을 골라 개인화된 코딩 실습을 받고, 같은 화면에서 실행(Sandpack)하고, AI 피드백을 받는 단일 화면 웹앱.
+- **Who it's for:** 프론트엔드 개발 부트캠프 학습자로 시작 (직무 무관 확장을 염두에 두되, 구조만 확장 가능하게 설계).
+- **Space/industry:** 개발자 학습 도구 / AI 코딩 어시스턴트.
+- **Project type:** 웹 앱 (단일 화면, 3영역: 구조화된 프롬프트 빌더 / Sandpack 에디터+실행 프리뷰 / AI 지시·피드백 패널).
+- **기억 포인트:** "부담 없이 눌러서 시작하는 느낌."
+
+## Aesthetic Direction
+- **Direction:** Terminal(macOS 터미널 창) — 개발자 도구의 어휘를 그대로 가져오되, 사용자에게 직접 말을 거는 단 한 줄에만 사람의 목소리를 얹는다.
+- **Decoration level:** minimal — 배경 텍스처/그리드 없음 (초기안의 그래프 페이퍼 그리드는 가독성 문제로 제거). 장식은 트래픽라이트 점, ASCII 진행률 바 정도로 최소화.
+- **Mood:** 정직하고 담백한 개발 도구. 다크 SaaS 대시보드도, 파스텔 AI 챗봇도 아님. 신뢰는 터미널 어휘(모노스페이스, CLI 메뉴, 주석 스타일 진행률)에서, 따뜻함은 헤딩 한 줄의 세리프 이탤릭에서 나온다.
+- **Reference sites:** openlume.com (경쟁 서비스 — 스텝형 온보딩 + 진행률 표시 패턴만 참고, 컬러/레이아웃은 의도적으로 따라가지 않음).
+- **Color reference:** [Apple System Colors — Light](https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/schemes/Apple%20System%20Colors%20Light.itermcolors), [Apple System Colors — Dark](https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/schemes/Apple%20System%20Colors.itermcolors) (mbadolato/iTerm2-Color-Schemes).
+
+## Typography
+- **Voice (사용자에게 말을 거는 단 한 줄):** Fraunces (italic, 500) — 예: 스텝 질문 헤딩("오늘 배운 개념을 골라주세요"). 이 역할에만 한정해서 쓴다.
+- **Body:** Instrument Sans — 설명 문단, 힌트 텍스트.
+- **UI 크롬(진행률, back/continue, 윈도우 타이틀):** JetBrains Mono.
+- **선택지 / 리스트 항목 (한글 개념명 + 영문 API명이 섞이는 지점):** Nanum Gothic Coding — JetBrains Mono는 한글이 라틴 폭에 맞춰져 있지 않아 한/영 혼용 줄에서 리듬이 깨짐. 선택형 옵션(개념 선택기, 상황 칩 등)에만 적용하고 UI 크롬은 JetBrains Mono를 유지한다.
+- **Code(Sandpack 에디터):** JetBrains Mono.
+- **Loading:** Google Fonts CDN.
+  ```
+  https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500;600&family=Nanum+Gothic+Coding:wght@400;700&display=swap
+  ```
+- **Scale:** voice 22–40px / section label 14px (mono, uppercase) / body 15.5px / UI·mono 12–14px / hint 13.5px.
+
+## Color
+- **Approach:** restrained — 액센트 1개(blue) + 시맨틱 3개(red/green/yellow) + 중립. 브랜드 컬러를 별도로 만들지 않고 macOS 시스템 컬러를 그대로 채택.
+- **Primary accent (blue):** Light `#3B82F7` / Dark `#0A84FF` (다크 값은 실제 macOS systemBlue와 동일) — CTA, 링크, 선택 상태 텍스트.
+- **Selection (선택된 항목 배경):** Light `#B4D7FF` / Dark `#3F638B` — 스킴의 Selection Color를 그대로 사용.
+- **Semantic:**
+  - success(green): Light `#3FA24A` / Dark `#32D74B`
+  - warning(yellow): Light `#B4930A` / Dark `#FFD60A`
+  - error(red): Light `#EB5545` / Dark `#FF453A`
+- **Neutrals:**
+  - background: Light `#FFFFFF` / Dark `#1E1E1E`
+  - surface(window chrome, 카드): Light `#F6F6F7` / Dark `#2A2A2C`
+  - sunken(코드 블록): Light `#EEEEF0` / Dark `#161616`
+  - titlebar: Light `#ECECEE` / Dark `#323234`
+  - foreground(ink): Light `#1D1D1F` / Dark `#F2F2F5`
+  - muted text: Light `#6E6E73` / Dark `#98989D`
+  - faint text: Light `#98989D` / Dark `#6E6E73`
+  - line/border: Light `#DBDBDF` (strong `#C6C6CB`) / Dark `#3A3A3C` (strong `#48484A`)
+- **Dark mode:** 별도 팔레트로 완전히 정의(위 값). 채도를 임의로 낮추지 않고 스킴의 dark 원본 값을 그대로 사용.
+
+## Spacing
+- **Base unit:** 8px.
+- **Density:** comfortable — 터미널 창 내부 패딩 28–36px, 카드/리스트 아이템 패딩 10–14px.
+- **Scale:** 2xs(2) xs(4) sm(8) md(16) lg(24) xl(32) 2xl(48).
+
+## Layout
+- **Approach:** grid-disciplined. 단일 화면 3영역(프롬프트 빌더 / Sandpack 에디터+프리뷰 / AI 피드백 패널)을 명확한 그리드로 배치.
+- **프롬프트 빌더 내부:** 한 번에 한 스텝만 보여주는 macOS 터미널 창(traffic-light 점 + 타이틀바) 안에 단일 컬럼 카드. 선택지는 번호가 매겨진 CLI 메뉴 형태(`1 useState`, `2 이벤트 버블링` …), 선택된 항목은 번호 자리를 `>`로 치환 + Selection 배경색.
+- **진행률:** 아이콘 뱃지 레일 대신 `# step N of 4` 주석 스타일 텍스트 + ASCII 바(`[■■□□] 50%`).
+- **Max content width:** 980px (프리뷰 기준), 실제 앱은 3영역 그리드에 맞춰 조정.
+- **Border radius:** sm 5px / md 9px — 소프트한 라운드보다 각 잡힌 툴 느낌 유지.
+
+## Motion
+- **Approach:** minimal-functional. 프롬프트 라인의 커서 깜빡임 정도만 장식적 모션으로 허용, 나머지는 상태 전환(스텝 이동, 스트리밍 텍스트)을 돕는 용도로만 사용.
+- **Easing:** enter(ease-out) exit(ease-in) move(ease-in-out).
+- **Duration:** micro(50-100ms) short(150-250ms) medium(250-400ms).
+- `prefers-reduced-motion` 존중 (커서 깜빡임 등 장식 애니메이션은 비활성화).
+
+## Decisions Log
+| Date | Decision | Rationale |
+|------|----------|-----------|
+| 2026-08-20 | "코드 스케치북"(종이+세리프) 1차안 제안 | 낙서하듯 가볍게 시작한다는 기억 포인트에 맞춰 제안, openlume과 색/레이아웃 차별화 |
+| 2026-08-20 | 종이+세리프 → 터미널 컨셉으로 전면 전환 | "IT 느낌이 떨어진다"는 피드백. 세리프는 사용자에게 말을 거는 단 한 줄에만 남기고 나머지는 터미널 어휘로 전환 |
+| 2026-08-20 | 배경 그래프 그리드 제거 | 가독성 저하 피드백 |
+| 2026-08-20 | 컬러를 Apple System Colors(iTerm 스킴) light/dark로 확정 | 사용자가 직접 참조 스킴 첨부 — 다크 값이 실제 macOS 시스템 컬러와 일치해 신뢰도 높음 |
+| 2026-08-20 | 선택지 폰트를 Nanum Gothic Coding으로, UI 크롬(진행률/버튼)은 JetBrains Mono 유지 | 한글 개념명 + 영문 API명이 섞이는 지점에서 JetBrains Mono의 라틴 중심 폭이 리듬을 깨서, 그 영역만 교체 |
+| 2026-08-20 | 선택된 리스트 항목의 볼드 처리 제거 | 색상(Selection 배경 + accent 텍스트)만으로 충분히 구분되어 볼드는 과함 — 최종 확정 |
