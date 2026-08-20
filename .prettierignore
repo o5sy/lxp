@@ -1,0 +1,8 @@
+.next
+node_modules
+package-lock.json
+
+# 프로젝트 기획/설계 문서는 포맷 대상에서 제외
+CLAUDE.md
+DESIGN.md
+docs/
