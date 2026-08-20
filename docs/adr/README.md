@@ -13,7 +13,7 @@ AI 맞춤 실습 생성기 프로젝트의 기술스택/아키텍처 결정 기�
 | [03](03-folder-structure-feature-based.md) | 폴더 구조: 기능별 슬라이스 (Lite FSD) |
 | [04](04-state-management-zustand.md) | 전역 상태: Zustand |
 | [05](05-styling-tailwind.md) | 스타일링: Tailwind CSS |
-| [06](06-ui-components-shadcn-radix.md) | UI 컴포넌트: shadcn/ui (Radix 기반) |
+| [06](06-ui-components-shadcn-base-ui.md) | UI 컴포넌트: shadcn/ui (Base UI 기반) |
 | [07](07-code-execution-sandpack.md) | 코드 실행: Sandpack |
 
 ## 기타 방침
