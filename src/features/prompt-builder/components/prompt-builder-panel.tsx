@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { TerminalWindow } from "@/shared/ui/terminal-window";
 
 export function PromptBuilderPanel() {
@@ -12,6 +14,13 @@ export function PromptBuilderPanel() {
         입력해서 제출할 수 있어요.
       </p>
       <p className="text-faint font-mono text-xs">[■□□□] 0%</p>
+      {/* TODO: 4스텝 실제 입력 로직 구현 전까지의 임시 이동 링크 */}
+      <Link
+        href="/practice/demo"
+        className="text-primary self-start font-mono text-xs underline underline-offset-2"
+      >
+        다음 →
+      </Link>
     </TerminalWindow>
   );
 }

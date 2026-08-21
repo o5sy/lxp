@@ -1,17 +1,11 @@
-import { FeedbackPanel } from "@/features/feedback-panel/components/feedback-panel";
-import { PracticeEditorPanel } from "@/features/practice-editor/components/practice-editor-panel";
 import { PromptBuilderPanel } from "@/features/prompt-builder/components/prompt-builder-panel";
 
 export default function Home() {
   return (
-    <div className="bg-background flex flex-1 justify-center px-6 py-8">
-      <main className="grid w-full max-w-[980px] flex-1 grid-cols-1 gap-4 lg:grid-cols-[1fr_1.4fr]">
-        <div className="flex flex-col gap-4">
-          <PromptBuilderPanel />
-          <FeedbackPanel />
-        </div>
-        <PracticeEditorPanel />
-      </main>
+    <div className="bg-background flex flex-1 items-center justify-center px-6 py-8">
+      <div className="w-full max-w-lg">
+        <PromptBuilderPanel />
+      </div>
     </div>
   );
 }

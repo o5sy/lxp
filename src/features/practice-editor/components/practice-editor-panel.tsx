@@ -4,6 +4,7 @@ export function PracticeEditorPanel() {
   return (
     <TerminalWindow
       title="practice.tsx — sandpack"
+      className="h-full"
       bodyClassName="items-center justify-center gap-3 bg-sunken p-6"
     >
       <p className="text-faint font-mono text-xs">
