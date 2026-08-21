@@ -1,15 +1,39 @@
+import { CodeCheckPanel } from "@/features/feedback-panel/components/code-check-panel";
 import { FeedbackPanel } from "@/features/feedback-panel/components/feedback-panel";
 import { InstructionPanel } from "@/features/feedback-panel/components/instruction-panel";
 import { PracticeEditorPanel } from "@/features/practice-editor/components/practice-editor-panel";
 
 export default function PracticeSessionPage() {
   return (
-    <div className="bg-background flex flex-1 flex-col gap-4 p-6">
-      <div className="grid flex-1 grid-cols-1 gap-4 lg:grid-cols-[1fr_1.4fr]">
-        <InstructionPanel />
-        <PracticeEditorPanel />
+    <div className="bg-background flex h-screen flex-col">
+      <header className="bg-titlebar border-line flex h-11 shrink-0 items-center gap-3 border-b px-4">
+        <div className="flex gap-1.5" aria-hidden="true">
+          <span className="bg-destructive/70 h-2.5 w-2.5 rounded-full" />
+          <span className="bg-warning/70 h-2.5 w-2.5 rounded-full" />
+          <span className="bg-success/70 h-2.5 w-2.5 rounded-full" />
+        </div>
+        <p className="text-muted-foreground font-mono text-xs">이벤트 버블링 실습</p>
+      </header>
+
+      <div className="flex flex-1 overflow-hidden">
+        <div className="border-line w-[320px] shrink-0 border-r">
+          <InstructionPanel />
+        </div>
+
+        <div className="flex flex-1 flex-col">
+          <div className="border-line flex-1 border-b">
+            <PracticeEditorPanel />
+          </div>
+          <div className="flex h-[220px] shrink-0">
+            <div className="flex-[3]">
+              <FeedbackPanel />
+            </div>
+            <div className="border-line flex-1 border-l">
+              <CodeCheckPanel />
+            </div>
+          </div>
+        </div>
       </div>
-      <FeedbackPanel />
     </div>
   );
 }
