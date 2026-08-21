@@ -4,7 +4,7 @@ export function PracticeEditorPanel() {
   return (
     <TerminalWindow
       title="practice.tsx — sandpack"
-      bodyClassName="items-center justify-center gap-3 bg-sunken p-8"
+      bodyClassName="items-center justify-center gap-3 bg-sunken p-6"
     >
       <p className="text-faint font-mono text-xs">
         {"// 실습을 생성하면 여기에 코드가 채워집니다"}

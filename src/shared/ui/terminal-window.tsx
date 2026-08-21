@@ -17,7 +17,7 @@ export function TerminalWindow({ title, children, className, bodyClassName }: Te
         className,
       )}
     >
-      <header className="border-line bg-titlebar flex items-center gap-2 border-b px-4 py-2.5">
+      <header className="border-line bg-titlebar flex items-center gap-2 border-b px-3 py-1.5">
         <div className="flex gap-1.5" aria-hidden="true">
           <span className="bg-destructive/70 h-2.5 w-2.5 rounded-full" />
           <span className="bg-warning/70 h-2.5 w-2.5 rounded-full" />

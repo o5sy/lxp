@@ -2,7 +2,7 @@ import { TerminalWindow } from "@/shared/ui/terminal-window";
 
 export function PromptBuilderPanel() {
   return (
-    <TerminalWindow title="prompt-builder — step 1 of 4" bodyClassName="gap-6 p-8">
+    <TerminalWindow title="prompt-builder — step 1 of 4" bodyClassName="gap-3 p-5">
       <p className="text-muted-foreground font-mono text-xs tracking-wide uppercase">
         # step 1 of 4
       </p>

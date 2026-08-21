@@ -2,7 +2,7 @@ import { TerminalWindow } from "@/shared/ui/terminal-window";
 
 export function FeedbackPanel() {
   return (
-    <TerminalWindow title="ai-feedback" bodyClassName="justify-between gap-4 p-6">
+    <TerminalWindow title="ai-feedback" bodyClassName="justify-between gap-3 p-5">
       <p className="text-muted-foreground text-sm">
         실습이 생성되면 AI 지시가 여기에 스트리밍으로 표시됩니다.
       </p>
