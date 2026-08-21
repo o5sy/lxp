@@ -6,12 +6,7 @@ import { PracticeEditorPanel } from "@/features/practice-editor/components/pract
 export default function PracticeSessionPage() {
   return (
     <div className="bg-background flex h-screen flex-col">
-      <header className="bg-titlebar border-line flex h-11 shrink-0 items-center gap-3 border-b px-4">
-        <div className="flex gap-1.5" aria-hidden="true">
-          <span className="bg-destructive/70 h-2.5 w-2.5 rounded-full" />
-          <span className="bg-warning/70 h-2.5 w-2.5 rounded-full" />
-          <span className="bg-success/70 h-2.5 w-2.5 rounded-full" />
-        </div>
+      <header className="bg-titlebar border-line flex h-11 shrink-0 items-center border-b px-4">
         <p className="text-muted-foreground font-mono text-xs">이벤트 버블링 실습</p>
       </header>
 
