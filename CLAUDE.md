@@ -86,3 +86,13 @@ feat(관리자페이지): 영상 추가 기능 추가
 폰트, 컬러, 스페이싱, 톤앤매너는 모두 거기에 정의되어 있다.
 사용자의 명시적 승인 없이 이탈하지 않는다.
 QA 모드에서는 DESIGN.md와 맞지 않는 코드를 플래그한다.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->
