@@ -7,6 +7,11 @@
 - 브라우저로 뭔가 확인/테스트해야 할 때, `mcp__claude-in-chrome__*` 도구를 바로 쓰지 말고 **먼저 사용자에게 물어볼 것**: 실제 로그인된 Chrome(`claude-in-chrome`)으로 할지, gstack의 헤드리스 `/browse`로 할지.
 - 로그인 세션이 필요 없는 일반적인 QA/스크린샷/폼 테스트라면 `/browse`가 기본값이지만, 그래도 매번 확인 후 진행한다.
 
+## Git 작업 규칙
+
+- 커밋은 자율적으로 진행해도 된다.
+- **푸시(`git push`)는 매번 하기 전에 커밋 로그(`git log`)를 사용자에게 보여주고 확인받은 뒤에 실행한다.**
+
 ## 사용 가능한 스킬 (slash command)
 
 `_gstack-command`, `autoplan`, `benchmark`, `benchmark-models`, `browse`, `canary`, `careful`, `codex`, `connect-chrome`, `context-restore`, `context-save`, `cso`, `design-consultation`, `design-html`, `design-review`, `design-shotgun`, `devex-review`, `diagram`, `document-generate`, `document-release`, `freeze`, `gstack-upgrade`, `guard`, `health`, `investigate`, `ios-clean`, `ios-design-review`, `ios-fix`, `ios-qa`, `ios-sync`, `land-and-deploy`, `landing-report`, `learn`, `make-pdf`, `office-hours`, `open-gstack-browser`, `pair-agent`, `plan-ceo-review`, `plan-design-review`, `plan-devex-review`, `plan-eng-review`, `plan-tune`, `qa`, `qa-only`, `retro`, `review`, `scrape`, `setup-browser-cookies`, `setup-deploy`, `setup-gbrain`, `ship`, `skillify`, `spec`, `sync-gbrain`, `unfreeze`
