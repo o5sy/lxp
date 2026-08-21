@@ -1,4 +1,3 @@
-import { CodeCheckPanel } from "@/features/feedback-panel/components/code-check-panel";
 import { FeedbackPanel } from "@/features/feedback-panel/components/feedback-panel";
 import { InstructionPanel } from "@/features/feedback-panel/components/instruction-panel";
 import { PracticeEditorPanel } from "@/features/practice-editor/components/practice-editor-panel";
@@ -19,13 +18,8 @@ export default function PracticeSessionPage() {
           <div className="border-line flex-1 border-b">
             <PracticeEditorPanel />
           </div>
-          <div className="flex h-[220px] shrink-0">
-            <div className="flex-[3]">
-              <FeedbackPanel />
-            </div>
-            <div className="border-line flex-1 border-l">
-              <CodeCheckPanel />
-            </div>
+          <div className="h-[220px] shrink-0">
+            <FeedbackPanel />
           </div>
         </div>
       </div>
