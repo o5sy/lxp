@@ -29,6 +29,14 @@ type PromptBuilderState = {
   setStarterCode: (code: string) => void;
   setGenerationDone: () => void;
   setGenerationError: (message: string) => void;
+
+  feedbackStatus: AsyncStatus;
+  feedback: string;
+  feedbackError: string | null;
+  startFeedback: () => void;
+  appendFeedback: (delta: string) => void;
+  setFeedbackDone: () => void;
+  setFeedbackError: (message: string) => void;
 };
 
 export const usePromptBuilderStore = create<PromptBuilderState>((set) => ({
@@ -62,4 +70,12 @@ export const usePromptBuilderStore = create<PromptBuilderState>((set) => ({
   setStarterCode: (code) => set({ starterCode: code }),
   setGenerationDone: () => set({ generationStatus: "done" }),
   setGenerationError: (message) => set({ generationStatus: "error", generationError: message }),
+
+  feedbackStatus: "idle",
+  feedback: "",
+  feedbackError: null,
+  startFeedback: () => set({ feedbackStatus: "loading", feedback: "", feedbackError: null }),
+  appendFeedback: (delta) => set((state) => ({ feedbackStatus: "streaming", feedback: state.feedback + delta })),
+  setFeedbackDone: () => set({ feedbackStatus: "done" }),
+  setFeedbackError: (message) => set({ feedbackStatus: "error", feedbackError: message }),
 }));
