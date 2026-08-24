@@ -1,7 +1,9 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { useEffect } from "react";
 
+import { generatePractice } from "@/features/prompt-builder/lib/generate-practice";
 import { InstructionPanel } from "@/features/feedback-panel/components/instruction-panel";
 import { usePromptBuilderStore } from "@/store/prompt-builder-store";
 
@@ -12,6 +14,16 @@ const SandpackSession = dynamic(
 
 export default function PracticeSessionPage() {
   const concept = usePromptBuilderStore((state) => state.concept);
+  const stage = usePromptBuilderStore((state) => state.stage);
+  const situationTags = usePromptBuilderStore((state) => state.situationTags);
+  const freeText = usePromptBuilderStore((state) => state.freeText);
+
+  useEffect(() => {
+    if (usePromptBuilderStore.getState().generationStatus !== "idle") return;
+    if (!concept.trim() || !stage) return;
+    generatePractice({ concept, stage, situationTags, freeText });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="bg-background flex h-screen flex-col">
