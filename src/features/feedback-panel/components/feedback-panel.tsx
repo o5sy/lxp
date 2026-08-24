@@ -12,6 +12,8 @@ export function FeedbackPanel() {
   const instruction = usePromptBuilderStore((state) => state.instruction);
   const generationStatus = usePromptBuilderStore((state) => state.generationStatus);
   const feedbackStatus = usePromptBuilderStore((state) => state.feedbackStatus);
+  const feedback = usePromptBuilderStore((state) => state.feedback);
+  const feedbackError = usePromptBuilderStore((state) => state.feedbackError);
 
   const canRequestFeedback =
     generationStatus === "done" && stage !== null && feedbackStatus !== "loading" && feedbackStatus !== "streaming";
@@ -34,9 +36,16 @@ export function FeedbackPanel() {
           {feedbackStatus === "loading" || feedbackStatus === "streaming" ? "받는 중..." : "피드백 받기"}
         </button>
       </div>
-      <p className="text-muted-foreground p-4 text-sm">
-        실습이 생성되면 AI 피드백이 여기에 스트리밍으로 표시됩니다.
-      </p>
+
+      {feedbackStatus === "error" ? (
+        <p className="p-4 text-sm text-red-500">{feedbackError}</p>
+      ) : feedback ? (
+        <p className="text-muted-foreground p-4 text-sm whitespace-pre-wrap">{feedback}</p>
+      ) : (
+        <p className="text-muted-foreground p-4 text-sm">
+          실습이 생성되면 AI 피드백이 여기에 스트리밍으로 표시됩니다.
+        </p>
+      )}
     </div>
   );
 }
