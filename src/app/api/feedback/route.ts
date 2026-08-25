@@ -46,9 +46,7 @@ export async function POST(request: Request) {
           controller.enqueue(encoder.encode(sseEvent("feedback-delta", final.feedback.slice(sentFeedbackLength))));
         }
         controller.enqueue(
-          encoder.encode(
-            sseEvent("verdict", JSON.stringify({ criteriaMet: final.criteriaMet, unmetReasons: final.unmetReasons })),
-          ),
+          encoder.encode(sseEvent("verdict", JSON.stringify({ criteriaChecks: final.criteriaChecks }))),
         );
         controller.enqueue(encoder.encode(sseEvent("done", "")));
       } catch (error) {

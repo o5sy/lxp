@@ -33,11 +33,15 @@ export const feedbackSchema = z.object({
     .describe(
       "마크다운 형식의 피드백 본문. 정답을 바로 알려주지 않고, 코드를 관찰한 결과를 해석해서 설명하고 학습자가 스스로 확인해볼 예측 질문을 던진다.",
     ),
-  criteriaMet: z.boolean().describe("실습 지시문의 '완료 기준' 섹션을 학습자의 코드가 충족했는지 여부."),
-  unmetReasons: z
-    .array(z.string())
-    .optional()
-    .describe("criteriaMet이 false일 때만: 충족하지 못한 기준을 짧은 문장으로 나열. 고치는 방법은 포함하지 않는다."),
+  criteriaChecks: z
+    .array(
+      z.object({
+        criterion: z.string().describe("실습 지시문의 '완료 기준' 섹션에 있는 항목 원문 그대로 (요약·재작성하지 않음)."),
+        met: z.boolean().describe("학습자의 코드가 이 항목을 충족했는지 여부."),
+      }),
+    )
+    .describe("'완료 기준' 섹션의 각 항목을 지시문에 나온 순서 그대로, 빠짐없이 담는다."),
 });
 
 export type Feedback = z.infer<typeof feedbackSchema>;
+export type FeedbackCriterionCheck = Feedback["criteriaChecks"][number];

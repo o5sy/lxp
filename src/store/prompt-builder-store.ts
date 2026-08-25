@@ -1,5 +1,7 @@
 import { create } from "zustand";
 
+import type { FeedbackCriterionCheck } from "@/lib/llm/types";
+
 export type PcmlStage = "recall" | "apply" | "explain";
 
 export type AsyncStatus = "idle" | "loading" | "streaming" | "done" | "error";
@@ -8,8 +10,7 @@ export const TOTAL_BUILDER_STEPS = 4;
 
 export type FeedbackRound = {
   feedback: string;
-  criteriaMet: boolean | null;
-  unmetReasons: string[];
+  criteriaChecks: FeedbackCriterionCheck[] | null;
 };
 
 type PromptBuilderState = {
@@ -41,7 +42,7 @@ type PromptBuilderState = {
   feedbackError: string | null;
   startFeedback: () => void;
   appendFeedback: (delta: string) => void;
-  setFeedbackVerdict: (criteriaMet: boolean, unmetReasons: string[]) => void;
+  setFeedbackVerdict: (criteriaChecks: FeedbackCriterionCheck[]) => void;
   setFeedbackDone: () => void;
   setFeedbackError: (message: string) => void;
 };
@@ -84,7 +85,7 @@ export const usePromptBuilderStore = create<PromptBuilderState>((set) => ({
   startFeedback: () =>
     set((state) => ({
       feedbackStatus: "loading",
-      feedbackRounds: [...state.feedbackRounds, { feedback: "", criteriaMet: null, unmetReasons: [] }],
+      feedbackRounds: [...state.feedbackRounds, { feedback: "", criteriaChecks: null }],
       feedbackError: null,
     })),
   appendFeedback: (delta) =>
@@ -94,17 +95,17 @@ export const usePromptBuilderStore = create<PromptBuilderState>((set) => ({
         index === state.feedbackRounds.length - 1 ? { ...round, feedback: round.feedback + delta } : round,
       ),
     })),
-  setFeedbackVerdict: (criteriaMet, unmetReasons) =>
+  setFeedbackVerdict: (criteriaChecks) =>
     set((state) => ({
       feedbackRounds: state.feedbackRounds.map((round, index) =>
-        index === state.feedbackRounds.length - 1 ? { ...round, criteriaMet, unmetReasons } : round,
+        index === state.feedbackRounds.length - 1 ? { ...round, criteriaChecks } : round,
       ),
     })),
   setFeedbackDone: () => set({ feedbackStatus: "done" }),
   setFeedbackError: (message) =>
     set((state) => {
       const lastRound = state.feedbackRounds.at(-1);
-      const isEmptyRound = lastRound && lastRound.feedback === "" && lastRound.criteriaMet === null;
+      const isEmptyRound = lastRound && lastRound.feedback === "" && lastRound.criteriaChecks === null;
       return {
         feedbackStatus: "error",
         feedbackError: message,

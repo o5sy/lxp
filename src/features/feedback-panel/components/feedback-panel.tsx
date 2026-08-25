@@ -7,25 +7,23 @@ import { requestFeedback } from "@/features/feedback-panel/lib/request-feedback"
 import { MarkdownContent } from "@/shared/ui/markdown-content";
 import { type FeedbackRound, usePromptBuilderStore } from "@/store/prompt-builder-store";
 
-function FeedbackVerdictBadge({ round }: { round: FeedbackRound }) {
-  if (round.criteriaMet === null) return null;
+function FeedbackCriteriaChecklist({ round }: { round: FeedbackRound }) {
+  if (round.criteriaChecks === null) return null;
+
+  const metCount = round.criteriaChecks.filter((check) => check.met).length;
 
   return (
-    <div
-      className={
-        round.criteriaMet
-          ? "border-success/40 bg-success/10 text-success rounded-md border px-3 py-2 text-sm"
-          : "border-warning/40 bg-warning/10 text-warning rounded-md border px-3 py-2 text-sm"
-      }
-    >
-      <p className="font-medium">{round.criteriaMet ? "✅ 완료 기준 충족" : "⚠️ 아직 부족한 부분이 있어요"}</p>
-      {!round.criteriaMet && round.unmetReasons.length > 0 ? (
-        <ul className="mt-1.5 list-disc space-y-0.5 pl-4">
-          {round.unmetReasons.map((reason, index) => (
-            <li key={index}>{reason}</li>
-          ))}
-        </ul>
-      ) : null}
+    <div className="border-line rounded-md border px-3 py-2 text-sm">
+      <p className="text-faint mb-1.5 font-mono text-[11px] tracking-wide uppercase">
+        완료 기준 · {metCount}/{round.criteriaChecks.length}
+      </p>
+      <ul className="space-y-1">
+        {round.criteriaChecks.map((check, index) => (
+          <li key={index} className={check.met ? "text-success" : "text-warning"}>
+            {check.met ? "✅" : "⬜"} {check.criterion}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
@@ -41,13 +39,18 @@ export function FeedbackPanel() {
   const feedbackError = usePromptBuilderStore((state) => state.feedbackError);
 
   const logRef = useRef<HTMLDivElement>(null);
+  const latestRoundRef = useRef<HTMLDivElement>(null);
 
   const canRequestFeedback =
     generationStatus === "done" && stage !== null && feedbackStatus !== "loading" && feedbackStatus !== "streaming";
 
   useEffect(() => {
-    logRef.current?.scrollTo({ top: logRef.current.scrollHeight });
-  }, [feedbackRounds]);
+    if (feedbackStatus === "done") {
+      latestRoundRef.current?.scrollIntoView({ block: "start" });
+    } else {
+      logRef.current?.scrollTo({ top: logRef.current.scrollHeight });
+    }
+  }, [feedbackRounds, feedbackStatus]);
 
   const handleClick = () => {
     if (!stage) return;
@@ -74,9 +77,13 @@ export function FeedbackPanel() {
         {feedbackRounds.length > 0 ? (
           <div className="divide-line divide-y">
             {feedbackRounds.map((round, index) => (
-              <div key={index} className="flex flex-col gap-2 px-4 py-3">
+              <div
+                key={index}
+                ref={index === feedbackRounds.length - 1 ? latestRoundRef : undefined}
+                className="flex flex-col gap-2 px-4 py-3"
+              >
                 <p className="text-faint font-mono text-[11px] tracking-wide uppercase">#{index + 1}</p>
-                <FeedbackVerdictBadge round={round} />
+                <FeedbackCriteriaChecklist round={round} />
                 <MarkdownContent content={round.feedback} className="text-muted-foreground" />
               </div>
             ))}

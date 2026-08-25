@@ -1,4 +1,4 @@
-import type { FeedbackInput } from "@/lib/llm/types";
+import type { FeedbackCriterionCheck, FeedbackInput } from "@/lib/llm/types";
 import { parseSSE } from "@/shared/lib/parse-sse";
 import { usePromptBuilderStore } from "@/store/prompt-builder-store";
 
@@ -23,8 +23,8 @@ export async function requestFeedback(input: FeedbackInput) {
       if (event === "feedback-delta") {
         appendFeedback(data);
       } else if (event === "verdict") {
-        const verdict = JSON.parse(data) as { criteriaMet: boolean; unmetReasons?: string[] };
-        setFeedbackVerdict(verdict.criteriaMet, verdict.unmetReasons ?? []);
+        const verdict = JSON.parse(data) as { criteriaChecks: FeedbackCriterionCheck[] };
+        setFeedbackVerdict(verdict.criteriaChecks);
       } else if (event === "error") {
         throw new Error(data);
       } else if (event === "done") {
