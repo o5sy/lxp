@@ -1,6 +1,7 @@
 "use client";
 
 import { PCML_STAGES } from "@/features/prompt-builder/lib/options";
+import { MarkdownContent } from "@/shared/ui/markdown-content";
 import { usePromptBuilderStore } from "@/store/prompt-builder-store";
 
 export function InstructionPanel() {
@@ -28,7 +29,7 @@ export function InstructionPanel() {
       {generationStatus === "error" ? (
         <p className="mt-2 text-sm text-red-500">{generationError}</p>
       ) : instruction ? (
-        <p className="text-foreground mt-2 text-sm whitespace-pre-wrap">{instruction}</p>
+        <MarkdownContent content={instruction} className="mt-2" />
       ) : (
         <p className="text-muted-foreground mt-2 text-sm">
           {generationStatus === "loading" ? "실습 지시문을 생성하는 중입니다..." : "실습 지시가 생성되면 여기에 스트리밍으로 표시됩니다."}

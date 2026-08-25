@@ -3,6 +3,7 @@
 import { useActiveCode } from "@codesandbox/sandpack-react";
 
 import { requestFeedback } from "@/features/feedback-panel/lib/request-feedback";
+import { MarkdownContent } from "@/shared/ui/markdown-content";
 import { usePromptBuilderStore } from "@/store/prompt-builder-store";
 
 export function FeedbackPanel() {
@@ -40,7 +41,7 @@ export function FeedbackPanel() {
       {feedbackStatus === "error" ? (
         <p className="p-4 text-sm text-red-500">{feedbackError}</p>
       ) : feedback ? (
-        <p className="text-muted-foreground p-4 text-sm whitespace-pre-wrap">{feedback}</p>
+        <MarkdownContent content={feedback} className="text-muted-foreground p-4" />
       ) : (
         <p className="text-muted-foreground p-4 text-sm">
           실습이 생성되면 AI 피드백이 여기에 스트리밍으로 표시됩니다.
