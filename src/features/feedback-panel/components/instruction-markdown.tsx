@@ -9,11 +9,13 @@ import remarkGfm from "remark-gfm";
 
 import { markdownProseComponents } from "@/shared/ui/markdown-content";
 import { cn } from "@/shared/lib/utils";
+import type { FeedbackCriterionCheck } from "@/lib/llm/types";
 
 type InstructionMarkdownProps = {
   content: string;
   header?: ReactNode;
   isStreaming?: boolean;
+  criteriaChecks?: FeedbackCriterionCheck[] | null;
 };
 
 type Section = {
@@ -68,7 +70,7 @@ function PlainListItem({ children }: { children?: ReactNode }) {
   );
 }
 
-export function InstructionMarkdown({ content, header, isStreaming }: InstructionMarkdownProps) {
+export function InstructionMarkdown({ content, header, isStreaming, criteriaChecks }: InstructionMarkdownProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [activeId, setActiveId] = useState(OVERVIEW_ID);
 
@@ -152,7 +154,7 @@ export function InstructionMarkdown({ content, header, isStreaming }: Instructio
                 className={cn("scroll-mt-6", index > 0 && "mt-6")}
               >
                 {section.heading === "완료 기준" ? (
-                  <ChecklistSection markdown={section.markdown} />
+                  <ChecklistSection markdown={section.markdown} criteriaChecks={criteriaChecks ?? null} />
                 ) : (
                   <ReactMarkdown
                     remarkPlugins={[remarkGfm]}
@@ -171,16 +173,29 @@ export function InstructionMarkdown({ content, header, isStreaming }: Instructio
 }
 
 /**
- * "완료 기준" 목록을 실제로 체크할 수 있는 자가 점검 리스트로 렌더링한다.
+ * "완료 기준" 목록을 체크리스트로 렌더링한다. AI 피드백을 아직 받지 않았으면
+ * (criteriaChecks === null) 직접 클릭해서 켜고 끄는 자가 점검 리스트로 동작하고,
+ * 피드백을 받으면 그 판정(criteriaChecks[index].met, 지시문에 나온 순서와 동일)이
+ * 체크 상태를 대신하며 더 이상 클릭으로 바꿀 수 없다 — 이 시점부터는 자가 점검이
+ * 아니라 AI의 판정 결과이기 때문이다.
+ *
  * LLM이 GFM 태스크 문법(`- [ ] ...`)을 쓰면 remark-gfm이 비활성화된
  * <input type="checkbox">를 children에 끼워 넣는데, 그건 상호작용이 안 되므로
  * 걷어내고 우리가 관리하는 체크 상태로 항상 동일하게 렌더링한다.
  */
-function ChecklistSection({ markdown }: { markdown: string }) {
-  const [checked, setChecked] = useState<Record<number, boolean>>({});
+function ChecklistSection({
+  markdown,
+  criteriaChecks,
+}: {
+  markdown: string;
+  criteriaChecks: FeedbackCriterionCheck[] | null;
+}) {
+  const [selfChecked, setSelfChecked] = useState<Record<number, boolean>>({});
+  const isAiJudged = criteriaChecks !== null;
 
   const toggle = (index: number) => {
-    setChecked((prev) => ({ ...prev, [index]: !prev[index] }));
+    if (isAiJudged) return;
+    setSelfChecked((prev) => ({ ...prev, [index]: !prev[index] }));
   };
 
   let nextIndex = 0;
@@ -194,7 +209,7 @@ function ChecklistSection({ markdown }: { markdown: string }) {
         ul: PlainList,
         li: ({ children }) => {
           const index = nextIndex++;
-          const isChecked = checked[index] ?? false;
+          const isChecked = isAiJudged ? (criteriaChecks[index]?.met ?? false) : (selfChecked[index] ?? false);
           const label = stripNativeCheckbox(children);
 
           return (
@@ -202,13 +217,18 @@ function ChecklistSection({ markdown }: { markdown: string }) {
               <button
                 type="button"
                 onClick={() => toggle(index)}
-                className="group flex w-full cursor-pointer items-start gap-2 text-left"
+                className={cn(
+                  "group flex w-full items-start gap-2 text-left",
+                  isAiJudged ? "cursor-default" : "cursor-pointer",
+                )}
                 aria-pressed={isChecked}
               >
                 <span
                   className={cn(
                     "mt-0.5 flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-[3px] border transition-colors",
-                    isChecked ? "bg-primary border-primary" : "bg-background border-line-strong group-hover:border-primary",
+                    isChecked
+                      ? "bg-primary border-primary"
+                      : cn("bg-background border-line-strong", !isAiJudged && "group-hover:border-primary"),
                   )}
                   aria-hidden="true"
                 >

@@ -7,23 +7,20 @@ import { requestFeedback } from "@/features/feedback-panel/lib/request-feedback"
 import { MarkdownContent } from "@/shared/ui/markdown-content";
 import { type FeedbackRound, usePromptBuilderStore } from "@/store/prompt-builder-store";
 
-function FeedbackCriteriaChecklist({ round }: { round: FeedbackRound }) {
+function FeedbackVerdictBadge({ round }: { round: FeedbackRound }) {
   if (round.criteriaChecks === null) return null;
 
-  const metCount = round.criteriaChecks.filter((check) => check.met).length;
+  const allMet = round.criteriaChecks.every((check) => check.met);
 
   return (
-    <div className="border-line rounded-md border px-3 py-2 text-sm">
-      <p className="text-faint mb-1.5 font-mono text-[11px] tracking-wide uppercase">
-        완료 기준 · {metCount}/{round.criteriaChecks.length}
-      </p>
-      <ul className="space-y-1">
-        {round.criteriaChecks.map((check, index) => (
-          <li key={index} className={check.met ? "text-success" : "text-warning"}>
-            {check.met ? "✅" : "⬜"} {check.criterion}
-          </li>
-        ))}
-      </ul>
+    <div
+      className={
+        allMet
+          ? "border-success/40 bg-success/10 text-success rounded-md border px-3 py-2 text-sm font-medium"
+          : "border-warning/40 bg-warning/10 text-warning rounded-md border px-3 py-2 text-sm font-medium"
+      }
+    >
+      {allMet ? "✅ 완료 기준 충족" : "⚠️ 아직 부족한 부분이 있어요"}
     </div>
   );
 }
@@ -83,7 +80,7 @@ export function FeedbackPanel() {
                 className="flex flex-col gap-2 px-4 py-3"
               >
                 <p className="text-faint font-mono text-[11px] tracking-wide uppercase">#{index + 1}</p>
-                <FeedbackCriteriaChecklist round={round} />
+                <FeedbackVerdictBadge round={round} />
                 <MarkdownContent content={round.feedback} className="text-muted-foreground" />
               </div>
             ))}
