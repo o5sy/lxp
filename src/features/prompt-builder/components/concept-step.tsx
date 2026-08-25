@@ -179,7 +179,12 @@ export function ConceptStep() {
             onBlur={() => setIsOpen(false)}
             onKeyDown={handleKeyDown}
             placeholder="배운 기술/개념을 짧게 입력하세요 (예: useEffect, 이벤트 버블링)"
-            className="placeholder:text-faint selection:text-faint w-full bg-transparent font-mono text-base outline-none selection:bg-transparent"
+            className={cn(
+              "placeholder:text-faint w-full bg-transparent font-mono text-base outline-none",
+              // 인라인 제안이 떠 있을 때만 선택 영역을 회색으로 - 그 외의 일반적인
+              // 마우스 드래그 선택까지 회색으로 보이면 "선택됨" 표시가 안 보여 혼동된다.
+              isGhostShown && "selection:text-faint selection:bg-transparent",
+            )}
           />
         </div>
         {showSuggestions && (
