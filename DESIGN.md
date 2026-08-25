@@ -37,7 +37,7 @@
 - **Neutrals:**
   - background: Light `#FFFFFF` / Dark `#1E1E1E`
   - surface(window chrome, 카드): Light `#F6F6F7` / Dark `#2A2A2C`
-  - sunken(코드 블록): Light `#EEEEF0` / Dark `#161616` (입력 필드처럼 sunken을 쓰는 곳은 테두리를 `dark:border-muted-foreground`로 강조해 구분 — 아래 Decisions Log 참고)
+  - sunken(코드 블록): Light `#EEEEF0` / Dark `#161616` (입력 필드처럼 sunken을 쓰는 곳은 테두리를 `dark:border-faint`로 강조해 구분 — 아래 Decisions Log 참고)
   - titlebar: Light `#ECECEE` / Dark `#323234`
   - foreground(ink): Light `#1D1D1F` / Dark `#F2F2F5`
   - muted text: Light `#6E6E73` / Dark `#98989D`
@@ -83,3 +83,4 @@
 | 2026-08-25 | 실습 세션 타이틀바에 테마(라이트/다크) 토글 버튼 추가 — "제목 텍스트만" 원칙에서 예외 | 다크모드 지원에 최소한의 기능 요소가 필요해 예외를 둠. 나중에 인증이 붙으면 드롭다운이나 설정 화면으로 옮길 수 있도록 `ThemeToggle`을 위치에 종속되지 않는 독립 컴포넌트로 구현 |
 | 2026-08-25 | 다크모드 `sunken` 값을 `#161616`에서 `#48484A`(line-strong과 동일)로 변경 | 실제 다크모드를 켜보니 `sunken`이 배경과 대비비 1.09:1로 거의 안 보임 — 배경(`#1E1E1E`)이 이미 스킴에서 가장 어두운 값이라 더 어둡게 갈 여지가 없고, 다크 UI에서는 리세스드 표면을 배경보다 밝게 가야 구분됨(Material Design 다크테마와 동일 원리). 새 색을 추가하지 않고 기존 `line-strong` 값을 재사용해 대비비 1.83:1로 개선 |
 | 2026-08-25 | 위 변경을 되돌리고(`sunken` 다시 `#161616`), 입력 필드 테두리를 `dark:border-faint`(대비비 3.29:1)로 강조하는 방식으로 전환 | `sunken`을 배경보다 밝게 만들면 대비는 확보되지만 "움푹 들어간(recessed)" 느낌이 반대로 "튀어나온" 느낌이 되어 인풋처럼 안 보인다는 피드백. 배경을 밝히는 대안도 검토했으나 카드/타이틀바보다 배경이 밝아지는 위계 역전이 생겨 기각. 채우기 대신 항상 보이는 고대비 테두리로 구분하는 쪽이 sunken의 원래 metaphor를 지키면서 범위도 컴포넌트 단위로 한정됨. 처음 시도한 `border-muted-foreground`(5.81:1)는 다크모드에서 지나치게 밝아 보여, WCAG 비텍스트 임계값(3:1)에 가까운 `border-faint`로 낮춤 |
+| 2026-08-25 | 스텝2 비선택 항목 텍스트를 라이트모드에서만 `text-muted-foreground/80`(대비비 3.22:1)로, 선택 항목 description을 `text-foreground/70`(대비비 약 5.1:1)로 낮춤 (다크모드는 그대로) | `text-muted-foreground`/`text-foreground`는 다크모드 대비 기준으로 고른 값이라 라이트모드에서는 원래 톤(`text-faint`, 2.66:1)보다 지나치게 진해 보인다는 피드백. 같은 토큰을 알파로만 낮춰 새 색을 추가하지 않으면서 AA(4.5:1)는 넉넉히 넘는 선에서 톤을 완화 |
