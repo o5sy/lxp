@@ -1,6 +1,6 @@
 "use client";
 
-import { useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 
 import { CONCEPT_SUGGESTIONS } from "@/features/prompt-builder/lib/options";
 import { cn } from "@/shared/lib/utils";
@@ -27,8 +27,6 @@ export function ConceptStep() {
   // 않도록, 그리고 렌더 중에 ref를 읽지 않도록 이벤트 핸들러에서 명시적으로 설정한다.
   const [isGhostShown, setIsGhostShown] = useState(false);
 
-  const inputRef = useRef<HTMLInputElement>(null);
-  const pendingSelectionRef = useRef<{ start: number; end: number } | null>(null);
   // 백스페이스/Delete/Esc로 인라인 제안을 지운 직후에는, 같은 접두어로 곧바로
   // 다시 채워 넣지 않도록 잠깐 억제한다. 새 글자를 입력하면 다시 활성화된다.
   // keydown -> input 이벤트가 같은 틱에서 연달아 발생하므로 리렌더를 기다리지
@@ -47,29 +45,27 @@ export function ConceptStep() {
 
   const showSuggestions = isOpen && suggestions.length > 0;
 
-  useLayoutEffect(() => {
-    if (pendingSelectionRef.current && inputRef.current) {
-      const { start, end } = pendingSelectionRef.current;
-      inputRef.current.setSelectionRange(start, end);
-      pendingSelectionRef.current = null;
-    }
-  });
-
   const selectSuggestion = (item: string) => {
     setConcept(item);
     setActiveIndex(-1);
   };
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const rawValue = event.target.value;
+    const input = event.currentTarget;
+    const rawValue = input.value;
     const rawQuery = rawValue.trim().toLowerCase();
     const match = !suppressGhostRef.current && rawQuery ? findPrefixMatch(rawQuery) : undefined;
 
     if (match) {
       // 타이핑한 부분(rawValue) 뒤를 매칭된 단어 전체로 채우고, 아직 타이핑하지
-      // 않은 나머지를 실제 텍스트 선택 영역으로 만든다 - 스크린리더에도 그대로
-      // 읽히는 진짜 입력값이라 별도 오버레이 DOM보다 견고하다.
-      pendingSelectionRef.current = { start: rawValue.length, end: match.length };
+      // 않은 나머지를 실제 텍스트 선택 영역으로 만든다. DOM 값/선택을 먼저
+      // 직접 맞춰둔 뒤에 상태를 동기화한다 - setConcept만 먼저 호출하면, 리렌더
+      // 시점에 React가 controlled input의 커서 위치를 보존하려고 하면서 우리가
+      // 지정한 선택 범위를 덮어써 버린다(연속 타이핑 시 선택이 끝으로 붕괴되는
+      // 원인이었다). DOM을 먼저 원하는 최종 상태로 만들어 두면 React는 값이
+      // 이미 일치한다고 보고 선택 영역을 건드리지 않는다.
+      input.value = match;
+      input.setSelectionRange(rawValue.length, match.length);
       setConcept(match);
       setIsGhostShown(true);
     } else {
@@ -156,7 +152,6 @@ export function ConceptStep() {
         <div className="focus-within:border-primary border-line bg-sunken flex items-center gap-2.5 rounded-md border px-4.5 py-4">
           <span className="text-primary font-mono text-xl font-semibold">&gt;</span>
           <input
-            ref={inputRef}
             type="text"
             role="combobox"
             aria-autocomplete="both"
