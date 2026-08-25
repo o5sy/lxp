@@ -40,7 +40,7 @@ const nanumGothicCoding = Nanum_Gothic_Coding({
 });
 
 export const metadata: Metadata = {
-  title: "AI 맞춤 실습 생성기",
+  title: "AI 실습 튜터",
   description:
     "방금 배운 개념을 골라 개인화된 코딩 실습을 받고, 같은 화면에서 실행하고 피드백을 받습니다.",
 };
