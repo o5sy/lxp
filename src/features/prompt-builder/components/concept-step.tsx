@@ -147,9 +147,9 @@ export function ConceptStep() {
     } else if (event.key === "ArrowUp") {
       if (suggestions.length === 0) return;
       event.preventDefault();
-      if (!showSuggestions) {
+      if (!showSuggestions || activeIndex === -1) {
         setIsOpen(true);
-        setActiveIndex(suggestions.length - 1);
+        setActiveIndex(0);
         return;
       }
       setActiveIndex((current) => (current - 1 + suggestions.length) % suggestions.length);
