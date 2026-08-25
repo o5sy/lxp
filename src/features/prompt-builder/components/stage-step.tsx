@@ -1,8 +1,11 @@
 "use client";
 
+import { Radio } from "@base-ui/react/radio";
+import { RadioGroup } from "@base-ui/react/radio-group";
+
 import { PCML_STAGES } from "@/features/prompt-builder/lib/options";
 import { cn } from "@/shared/lib/utils";
-import { usePromptBuilderStore } from "@/store/prompt-builder-store";
+import { type PcmlStage, usePromptBuilderStore } from "@/store/prompt-builder-store";
 
 export function StageStep() {
   const stage = usePromptBuilderStore((state) => state.stage);
@@ -10,21 +13,29 @@ export function StageStep() {
 
   return (
     <div className="flex flex-col gap-3">
-      <p className="text-faint font-mono text-xs">stage</p>
+      <p id="stage-step-label" className="text-faint font-mono text-xs">
+        stage
+      </p>
       <h2 className="font-heading text-foreground text-[26px] italic">
         지금 이 개념, 어디까지 왔나요?
       </h2>
       <p className="text-muted-foreground max-w-md text-sm">
         가장 가까운 상태 하나를 골라주세요. 어느 쪽이든 괜찮아요.
       </p>
-      <ul className="border-line bg-card overflow-hidden rounded-md border">
+      <RadioGroup
+        aria-labelledby="stage-step-label"
+        value={stage}
+        onValueChange={(value) => setStage(value as PcmlStage)}
+        className="border-line bg-card overflow-hidden rounded-md border"
+      >
         {PCML_STAGES.map((option, index) => {
           const selected = stage === option.value;
           return (
-            <li key={option.value} className={cn(index > 0 && "border-line border-t")}>
-              <button
-                type="button"
-                onClick={() => setStage(option.value)}
+            <div key={option.value} className={cn(index > 0 && "border-line border-t")}>
+              <Radio.Root
+                value={option.value}
+                nativeButton
+                render={<button type="button" />}
                 className={cn(
                   "flex w-full items-center gap-3 px-4 py-3.5 text-left",
                   selected && "bg-selection",
@@ -44,11 +55,11 @@ export function StageStep() {
                     {index + 1}단계: {option.stageName}
                   </span>
                 </span>
-              </button>
-            </li>
+              </Radio.Root>
+            </div>
           );
         })}
-      </ul>
+      </RadioGroup>
     </div>
   );
 }
