@@ -6,6 +6,12 @@ export type AsyncStatus = "idle" | "loading" | "streaming" | "done" | "error";
 
 export const TOTAL_BUILDER_STEPS = 4;
 
+export type FeedbackRound = {
+  feedback: string;
+  criteriaMet: boolean | null;
+  unmetReasons: string[];
+};
+
 type PromptBuilderState = {
   step: number;
   concept: string;
@@ -31,9 +37,7 @@ type PromptBuilderState = {
   setGenerationError: (message: string) => void;
 
   feedbackStatus: AsyncStatus;
-  feedback: string;
-  feedbackCriteriaMet: boolean | null;
-  feedbackUnmetReasons: string[];
+  feedbackRounds: FeedbackRound[];
   feedbackError: string | null;
   startFeedback: () => void;
   appendFeedback: (delta: string) => void;
@@ -75,15 +79,36 @@ export const usePromptBuilderStore = create<PromptBuilderState>((set) => ({
   setGenerationError: (message) => set({ generationStatus: "error", generationError: message }),
 
   feedbackStatus: "idle",
-  feedback: "",
-  feedbackCriteriaMet: null,
-  feedbackUnmetReasons: [],
+  feedbackRounds: [],
   feedbackError: null,
   startFeedback: () =>
-    set({ feedbackStatus: "loading", feedback: "", feedbackCriteriaMet: null, feedbackUnmetReasons: [], feedbackError: null }),
-  appendFeedback: (delta) => set((state) => ({ feedbackStatus: "streaming", feedback: state.feedback + delta })),
+    set((state) => ({
+      feedbackStatus: "loading",
+      feedbackRounds: [...state.feedbackRounds, { feedback: "", criteriaMet: null, unmetReasons: [] }],
+      feedbackError: null,
+    })),
+  appendFeedback: (delta) =>
+    set((state) => ({
+      feedbackStatus: "streaming",
+      feedbackRounds: state.feedbackRounds.map((round, index) =>
+        index === state.feedbackRounds.length - 1 ? { ...round, feedback: round.feedback + delta } : round,
+      ),
+    })),
   setFeedbackVerdict: (criteriaMet, unmetReasons) =>
-    set({ feedbackCriteriaMet: criteriaMet, feedbackUnmetReasons: unmetReasons }),
+    set((state) => ({
+      feedbackRounds: state.feedbackRounds.map((round, index) =>
+        index === state.feedbackRounds.length - 1 ? { ...round, criteriaMet, unmetReasons } : round,
+      ),
+    })),
   setFeedbackDone: () => set({ feedbackStatus: "done" }),
-  setFeedbackError: (message) => set({ feedbackStatus: "error", feedbackError: message }),
+  setFeedbackError: (message) =>
+    set((state) => {
+      const lastRound = state.feedbackRounds.at(-1);
+      const isEmptyRound = lastRound && lastRound.feedback === "" && lastRound.criteriaMet === null;
+      return {
+        feedbackStatus: "error",
+        feedbackError: message,
+        feedbackRounds: isEmptyRound ? state.feedbackRounds.slice(0, -1) : state.feedbackRounds,
+      };
+    }),
 }));
