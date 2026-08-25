@@ -23,9 +23,13 @@ export function ConceptStep() {
   const setConcept = usePromptBuilderStore((state) => state.setConcept);
   const [isOpen, setIsOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
-  // 인라인 자동완성(ghost)이 현재 화면에 보이는지 - 드롭다운과 동시에 보이지
-  // 않도록, 그리고 렌더 중에 ref를 읽지 않도록 이벤트 핸들러에서 명시적으로 설정한다.
+  // 인라인 자동완성(ghost)이 현재 화면에 보이는지 - 선택 영역 스타일링에 쓴다.
   const [isGhostShown, setIsGhostShown] = useState(false);
+  // 인라인 제안이 떠 있는 동안, concept 앞에서부터 실제로 타이핑한 글자 수.
+  // null이면 지금 concept 전체가 곧 타이핑한 내용이라는 뜻(제안이 없거나
+  // 이미 확정됨). 드롭다운은 이 "실제로 타이핑한 부분"만으로 검색해야
+  // 확장된 전체 문자열이 아니라 사용자가 친 글자 기준으로 매칭된다.
+  const [typedLength, setTypedLength] = useState<number | null>(null);
 
   // 백스페이스/Delete/Esc로 인라인 제안을 지운 직후에는, 같은 접두어로 곧바로
   // 다시 채워 넣지 않도록 잠깐 억제한다. 새 글자를 입력하면 다시 활성화된다.
@@ -38,31 +42,38 @@ export function ConceptStep() {
   // 뒤의 입력에만 인라인 제안을 적용한다.
   const isComposingRef = useRef(false);
 
-  const query = concept.trim().toLowerCase();
+  const typedText = typedLength === null ? concept : concept.slice(0, typedLength);
+  const query = typedText.trim().toLowerCase();
 
-  // 인라인 자동완성(ghost) 후보가 있으면 그것만 보여주고, 없을 때만 드롭다운을 보여준다.
+  // 드롭다운은 인라인 제안과 별개로, 실제로 타이핑한 부분 기준으로 항상 보여준다.
+  // 인라인 제안과 겹치는 항목은 중복으로 보이지 않도록 제외한다.
   const suggestions = useMemo(() => {
-    if (!query || isGhostShown) return [];
+    if (!query) return [];
+    const ghostMatch = findPrefixMatch(query);
     return CONCEPT_SUGGESTIONS.filter(
-      (item) => item.toLowerCase().includes(query) && item.toLowerCase() !== query,
+      (item) =>
+        item.toLowerCase().includes(query) && item.toLowerCase() !== query && item !== ghostMatch,
     ).slice(0, 6);
-  }, [query, isGhostShown]);
+  }, [query]);
 
   const showSuggestions = isOpen && suggestions.length > 0;
 
   const selectSuggestion = (item: string) => {
     setConcept(item);
     setActiveIndex(-1);
+    setIsGhostShown(false);
+    setTypedLength(null);
   };
 
   // 아직 확정하지 않은(선택된) 인라인 제안을 거절하고, 실제로 타이핑한
   // 부분까지만 남긴다. Esc뿐 아니라 포커스 아웃(다른 곳 클릭 등)도 같은
   // "확정 안 함" 의사로 취급한다 - 그냥 두면 제안이 그대로 값으로 굳어버린다.
   const rejectGhost = (input: HTMLInputElement) => {
-    const typedLength = input.selectionStart ?? input.value.length;
+    const typedUpTo = input.selectionStart ?? input.value.length;
     suppressGhostRef.current = true;
-    setConcept(input.value.slice(0, typedLength));
+    setConcept(input.value.slice(0, typedUpTo));
     setIsGhostShown(false);
+    setTypedLength(null);
   };
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -89,9 +100,11 @@ export function ConceptStep() {
       input.value = match;
       input.setSelectionRange(rawValue.length, match.length);
       setConcept(match);
+      setTypedLength(rawValue.length);
       setIsGhostShown(true);
     } else {
       setConcept(rawValue);
+      setTypedLength(null);
       setIsGhostShown(false);
     }
     setIsOpen(true);
@@ -117,6 +130,7 @@ export function ConceptStep() {
         const end = input.value.length;
         input.setSelectionRange(end, end);
         setIsGhostShown(false);
+        setTypedLength(null);
       }
       return;
     }
