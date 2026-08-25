@@ -12,6 +12,7 @@ import { cn } from "@/shared/lib/utils";
 
 type InstructionMarkdownProps = {
   content: string;
+  header?: ReactNode;
 };
 
 type Section = {
@@ -52,8 +53,8 @@ function PlainListItem({ children }: { children?: ReactNode }) {
   return <li className="pl-1">{children}</li>;
 }
 
-export function InstructionMarkdown({ content }: InstructionMarkdownProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
+export function InstructionMarkdown({ content, header }: InstructionMarkdownProps) {
+  const scrollRef = useRef<HTMLDivElement>(null);
   const [activeId, setActiveId] = useState(OVERVIEW_ID);
 
   const sections = splitSections(content);
@@ -61,7 +62,7 @@ export function InstructionMarkdown({ content }: InstructionMarkdownProps) {
   const headedSections = sections.filter((section) => section.heading !== null);
 
   useEffect(() => {
-    const container = containerRef.current;
+    const container = scrollRef.current;
     if (!container) return;
 
     const targets = [OVERVIEW_ID, ...Object.values(HEADED_SECTION_IDS)]
@@ -69,59 +70,79 @@ export function InstructionMarkdown({ content }: InstructionMarkdownProps) {
       .filter((el): el is HTMLElement => el !== null);
     if (targets.length === 0) return;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries.filter((entry) => entry.isIntersecting);
-        if (visible.length === 0) return;
-        const topmost = visible.reduce((a, b) => (a.boundingClientRect.top <= b.boundingClientRect.top ? a : b));
-        setActiveId(topmost.target.id);
-      },
-      { root: container, rootMargin: "0px 0px -70% 0px", threshold: 0 },
-    );
+    // "상단 기준선을 지나친 섹션 중 마지막 것"을 활성으로 고른다. 단, 마지막
+    // 섹션 자체의 콘텐츠가 컨테이너보다 짧으면 아무리 끝까지 스크롤해도 그
+    // 섹션이 기준선까지 올라오지 못해 영원히 활성화되지 않는 문제가 있다 —
+    // 그래서 스크롤이 바닥에 닿았을 때는 항상 마지막 섹션을 강제로 활성 처리
+    // 한다(표준 scrollspy 패턴).
+    const TOP_THRESHOLD_PX = 24;
 
-    targets.forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
+    const updateActiveSection = () => {
+      const atBottom = container.scrollTop + container.clientHeight >= container.scrollHeight - 1;
+      if (atBottom) {
+        setActiveId(targets[targets.length - 1].id);
+        return;
+      }
+
+      const containerTop = container.getBoundingClientRect().top;
+      let current = targets[0];
+      for (const target of targets) {
+        if (target.getBoundingClientRect().top - containerTop <= TOP_THRESHOLD_PX) {
+          current = target;
+        }
+      }
+      setActiveId(current.id);
+    };
+
+    updateActiveSection();
+    container.addEventListener("scroll", updateActiveSection, { passive: true });
+    return () => container.removeEventListener("scroll", updateActiveSection);
   }, [content]);
 
   const scrollToSection = (id: string) => {
-    containerRef.current?.querySelector(`#${id}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    scrollRef.current?.querySelector(`#${id}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
   return (
-    <div ref={containerRef}>
-      <nav className="mt-6 mb-4 flex gap-4 pb-1 font-mono text-[11px] tracking-wide uppercase">
-        <SectionRailLink id={OVERVIEW_ID} label="개요" activeId={activeId} onClick={scrollToSection} />
-        {Object.entries(HEADED_SECTION_IDS).map(([label, id]) => (
-          <SectionRailLink key={id} id={id} label={label} activeId={activeId} onClick={scrollToSection} />
-        ))}
-      </nav>
-
-      {overview?.markdown.trim() && (
-        <div id={OVERVIEW_ID} className="text-foreground text-sm leading-relaxed">
-          <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownProseComponents}>
-            {overview.markdown}
-          </ReactMarkdown>
-        </div>
-      )}
-
-      {headedSections.length > 0 && (
-        <div className="bg-sunken text-foreground mt-4 rounded-md text-sm leading-relaxed">
-          {headedSections.map((section, index) => (
-            <div key={section.heading} id={section.heading ? HEADED_SECTION_IDS[section.heading] : undefined} className={index > 0 ? "mt-6" : undefined}>
-              {section.heading === "완료 기준" ? (
-                <ChecklistSection markdown={section.markdown} />
-              ) : (
-                <ReactMarkdown
-                  remarkPlugins={[remarkGfm]}
-                  components={{ ...markdownProseComponents, h2: SectionHeading, li: PlainListItem }}
-                >
-                  {section.markdown}
-                </ReactMarkdown>
-              )}
-            </div>
+    <div className="flex h-full flex-col">
+      <div className="bg-background shrink-0 px-6 pt-6 pb-3">
+        {header}
+        <nav className="mt-6 flex gap-4 font-mono text-[11px] tracking-wide uppercase">
+          <SectionRailLink id={OVERVIEW_ID} label="개요" activeId={activeId} onClick={scrollToSection} />
+          {Object.entries(HEADED_SECTION_IDS).map(([label, id]) => (
+            <SectionRailLink key={id} id={id} label={label} activeId={activeId} onClick={scrollToSection} />
           ))}
-        </div>
-      )}
+        </nav>
+      </div>
+
+      <div ref={scrollRef} className="flex-1 overflow-y-auto">
+        {overview?.markdown.trim() && (
+          <div id={OVERVIEW_ID} className="text-foreground px-6 pt-2 pb-4 text-sm leading-relaxed">
+            <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownProseComponents}>
+              {overview.markdown}
+            </ReactMarkdown>
+          </div>
+        )}
+
+        {headedSections.length > 0 && (
+          <div className="bg-sunken text-foreground px-6 py-6 text-sm leading-relaxed">
+            {headedSections.map((section, index) => (
+              <div key={section.heading} id={section.heading ? HEADED_SECTION_IDS[section.heading] : undefined} className={index > 0 ? "mt-6" : undefined}>
+                {section.heading === "완료 기준" ? (
+                  <ChecklistSection markdown={section.markdown} />
+                ) : (
+                  <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
+                    components={{ ...markdownProseComponents, h2: SectionHeading, li: PlainListItem }}
+                  >
+                    {section.markdown}
+                  </ReactMarkdown>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -157,13 +178,13 @@ function ChecklistSection({ markdown }: { markdown: string }) {
               <button
                 type="button"
                 onClick={() => toggle(index)}
-                className="flex w-full items-start gap-2 text-left"
+                className="group flex w-full items-start gap-2 text-left"
                 aria-pressed={isChecked}
               >
                 <span
                   className={cn(
-                    "mt-0.5 flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-[3px] border",
-                    isChecked ? "bg-primary border-primary" : "border-line-strong",
+                    "mt-0.5 flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-[3px] border transition-colors",
+                    isChecked ? "bg-primary border-primary" : "border-line-strong group-hover:border-primary",
                   )}
                   aria-hidden="true"
                 >
