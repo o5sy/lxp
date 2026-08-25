@@ -32,6 +32,11 @@ export function ConceptStep() {
   // keydown -> input 이벤트가 같은 틱에서 연달아 발생하므로 리렌더를 기다리지
   // 않고 즉시 반영돼야 해서 상태 대신 ref로 관리한다.
   const suppressGhostRef = useRef(false);
+  // 한글 등 IME 조합 중에는 절대 개입하면 안 된다 - 조합 중인 글자 위로 우리가
+  // input.value를 강제로 덮어쓰면 IME가 조합 상태를 잃고 글자가 깨지거나
+  // 사라진다 (예: "버블링" 입력 중 "블"이 통째로 날아가는 문제). 조합이 끝난
+  // 뒤의 입력에만 인라인 제안을 적용한다.
+  const isComposingRef = useRef(false);
 
   const query = concept.trim().toLowerCase();
 
@@ -54,7 +59,10 @@ export function ConceptStep() {
     const input = event.currentTarget;
     const rawValue = input.value;
     const rawQuery = rawValue.trim().toLowerCase();
-    const match = !suppressGhostRef.current && rawQuery ? findPrefixMatch(rawQuery) : undefined;
+    const match =
+      !isComposingRef.current && !suppressGhostRef.current && rawQuery
+        ? findPrefixMatch(rawQuery)
+        : undefined;
 
     if (match) {
       // 타이핑한 부분(rawValue) 뒤를 매칭된 단어 전체로 채우고, 아직 타이핑하지
@@ -161,6 +169,12 @@ export function ConceptStep() {
             autoComplete="off"
             value={concept}
             onChange={handleChange}
+            onCompositionStart={() => {
+              isComposingRef.current = true;
+            }}
+            onCompositionEnd={() => {
+              isComposingRef.current = false;
+            }}
             onFocus={() => setIsOpen(true)}
             onBlur={() => setIsOpen(false)}
             onKeyDown={handleKeyDown}
