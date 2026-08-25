@@ -1,12 +1,29 @@
 "use client";
 
-import { FeedbackPanel } from "@/features/feedback-panel/components/feedback-panel";
+import dynamic from "next/dynamic";
+import { useEffect } from "react";
+
+import { generatePractice } from "@/features/prompt-builder/lib/generate-practice";
 import { InstructionPanel } from "@/features/feedback-panel/components/instruction-panel";
-import { PracticeEditorPanel } from "@/features/practice-editor/components/practice-editor-panel";
 import { usePromptBuilderStore } from "@/store/prompt-builder-store";
+
+const SandpackSession = dynamic(
+  () => import("@/features/practice-editor/components/sandpack-session").then((mod) => mod.SandpackSession),
+  { ssr: false },
+);
 
 export default function PracticeSessionPage() {
   const concept = usePromptBuilderStore((state) => state.concept);
+  const stage = usePromptBuilderStore((state) => state.stage);
+  const situationTags = usePromptBuilderStore((state) => state.situationTags);
+  const freeText = usePromptBuilderStore((state) => state.freeText);
+
+  useEffect(() => {
+    if (usePromptBuilderStore.getState().generationStatus !== "idle") return;
+    if (!concept.trim() || !stage) return;
+    generatePractice({ concept, stage, situationTags, freeText });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="bg-background flex h-screen flex-col">
@@ -19,14 +36,7 @@ export default function PracticeSessionPage() {
           <InstructionPanel />
         </div>
 
-        <div className="flex flex-1 flex-col">
-          <div className="border-line flex-1 border-b">
-            <PracticeEditorPanel />
-          </div>
-          <div className="h-[220px] shrink-0">
-            <FeedbackPanel />
-          </div>
-        </div>
+        <SandpackSession />
       </div>
     </div>
   );

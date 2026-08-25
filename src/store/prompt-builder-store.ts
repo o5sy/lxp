@@ -2,6 +2,8 @@ import { create } from "zustand";
 
 export type PcmlStage = "recall" | "apply" | "explain";
 
+export type AsyncStatus = "idle" | "loading" | "streaming" | "done" | "error";
+
 export const TOTAL_BUILDER_STEPS = 4;
 
 type PromptBuilderState = {
@@ -17,6 +19,24 @@ type PromptBuilderState = {
   goNext: () => void;
   goBack: () => void;
   reset: () => void;
+
+  generationStatus: AsyncStatus;
+  instruction: string;
+  starterCode: string | null;
+  generationError: string | null;
+  startGeneration: () => void;
+  appendInstruction: (delta: string) => void;
+  setStarterCode: (code: string) => void;
+  setGenerationDone: () => void;
+  setGenerationError: (message: string) => void;
+
+  feedbackStatus: AsyncStatus;
+  feedback: string;
+  feedbackError: string | null;
+  startFeedback: () => void;
+  appendFeedback: (delta: string) => void;
+  setFeedbackDone: () => void;
+  setFeedbackError: (message: string) => void;
 };
 
 export const usePromptBuilderStore = create<PromptBuilderState>((set) => ({
@@ -38,4 +58,24 @@ export const usePromptBuilderStore = create<PromptBuilderState>((set) => ({
   goBack: () => set((state) => ({ step: Math.max(state.step - 1, 1) })),
   reset: () =>
     set({ step: 1, concept: "", stage: null, situationTags: [], freeText: "" }),
+
+  generationStatus: "idle",
+  instruction: "",
+  starterCode: null,
+  generationError: null,
+  startGeneration: () =>
+    set({ generationStatus: "loading", instruction: "", starterCode: null, generationError: null }),
+  appendInstruction: (delta) =>
+    set((state) => ({ generationStatus: "streaming", instruction: state.instruction + delta })),
+  setStarterCode: (code) => set({ starterCode: code }),
+  setGenerationDone: () => set({ generationStatus: "done" }),
+  setGenerationError: (message) => set({ generationStatus: "error", generationError: message }),
+
+  feedbackStatus: "idle",
+  feedback: "",
+  feedbackError: null,
+  startFeedback: () => set({ feedbackStatus: "loading", feedback: "", feedbackError: null }),
+  appendFeedback: (delta) => set((state) => ({ feedbackStatus: "streaming", feedback: state.feedback + delta })),
+  setFeedbackDone: () => set({ feedbackStatus: "done" }),
+  setFeedbackError: (message) => set({ feedbackStatus: "error", feedbackError: message }),
 }));
