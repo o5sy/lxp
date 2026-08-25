@@ -33,14 +33,14 @@ export function StageStep() {
                 <span
                   className={cn(
                     "font-mono text-sm font-semibold",
-                    selected ? "text-primary" : "text-faint",
+                    selected ? "text-primary" : "text-muted-foreground",
                   )}
                 >
                   {selected ? ">" : index + 1}
                 </span>
                 <span className="flex flex-col gap-0.5">
                   <span className="font-option text-foreground text-sm">{option.label}</span>
-                  <span className="text-faint font-mono text-xs">
+                  <span className={cn("font-mono text-xs", selected ? "text-foreground" : "text-muted-foreground")}>
                     {index + 1}단계: {option.stageName}
                   </span>
                 </span>
