@@ -15,7 +15,7 @@ function optionId(index: number) {
 export function ConceptStep() {
   const concept = usePromptBuilderStore((state) => state.concept);
   const setConcept = usePromptBuilderStore((state) => state.setConcept);
-  const [isFocused, setIsFocused] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
 
   const suggestions = useMemo(() => {
@@ -26,7 +26,7 @@ export function ConceptStep() {
     ).slice(0, 6);
   }, [concept]);
 
-  const showSuggestions = isFocused && suggestions.length > 0;
+  const showSuggestions = isOpen && suggestions.length > 0;
 
   const selectSuggestion = (item: string) => {
     setConcept(item);
@@ -34,22 +34,34 @@ export function ConceptStep() {
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (!showSuggestions) return;
-
     if (event.key === "ArrowDown") {
+      if (suggestions.length === 0) return;
       event.preventDefault();
+      if (!showSuggestions) {
+        setIsOpen(true);
+        setActiveIndex(0);
+        return;
+      }
       setActiveIndex((current) => (current + 1) % suggestions.length);
     } else if (event.key === "ArrowUp") {
+      if (suggestions.length === 0) return;
       event.preventDefault();
+      if (!showSuggestions) {
+        setIsOpen(true);
+        setActiveIndex(suggestions.length - 1);
+        return;
+      }
       setActiveIndex((current) => (current - 1 + suggestions.length) % suggestions.length);
     } else if (event.key === "Enter") {
-      if (activeIndex >= 0) {
+      if (showSuggestions && activeIndex >= 0) {
         event.preventDefault();
         selectSuggestion(suggestions[activeIndex]);
       }
     } else if (event.key === "Escape") {
-      setActiveIndex(-1);
-      setIsFocused(false);
+      if (showSuggestions) {
+        setIsOpen(false);
+        setActiveIndex(-1);
+      }
     }
   };
 
@@ -76,10 +88,11 @@ export function ConceptStep() {
             value={concept}
             onChange={(event) => {
               setConcept(event.target.value);
+              setIsOpen(true);
               setActiveIndex(-1);
             }}
-            onFocus={() => setIsFocused(true)}
-            onBlur={() => setIsFocused(false)}
+            onFocus={() => setIsOpen(true)}
+            onBlur={() => setIsOpen(false)}
             onKeyDown={handleKeyDown}
             placeholder="배운 기술/개념을 짧게 입력하세요 (예: useEffect, 이벤트 버블링)"
             className="placeholder:text-faint w-full bg-transparent font-mono text-base outline-none"
