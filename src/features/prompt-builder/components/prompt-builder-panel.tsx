@@ -54,7 +54,7 @@ export function PromptBuilderPanel() {
           <button
             type="button"
             onClick={goBack}
-            className="text-muted-foreground border-line rounded-md border px-4 py-2 font-mono text-xs font-medium"
+            className="text-muted-foreground border-line cursor-pointer rounded-md border px-4 py-2 font-mono text-xs font-medium"
           >
             ← 뒤로
           </button>
@@ -67,7 +67,7 @@ export function PromptBuilderPanel() {
             type="button"
             disabled={!canGoNext}
             onClick={goNext}
-            className="bg-primary text-primary-foreground rounded-md px-4 py-2 font-mono text-xs font-medium disabled:cursor-not-allowed disabled:opacity-50"
+            className="bg-primary text-primary-foreground cursor-pointer rounded-md px-4 py-2 font-mono text-xs font-medium disabled:cursor-not-allowed disabled:opacity-50"
           >
             다음 →
           </button>
@@ -76,7 +76,7 @@ export function PromptBuilderPanel() {
             type="button"
             disabled={isSubmitting}
             onClick={handleSubmit}
-            className="bg-primary text-primary-foreground rounded-md px-4 py-2 font-mono text-xs font-medium disabled:cursor-not-allowed disabled:opacity-50"
+            className="bg-primary text-primary-foreground cursor-pointer rounded-md px-4 py-2 font-mono text-xs font-medium disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isSubmitting ? "생성하는 중..." : "실습 생성하기 →"}
           </button>
@@ -87,7 +87,7 @@ export function PromptBuilderPanel() {
         <button
           type="button"
           onClick={() => router.push("/practice/mock-preview?mock=1")}
-          className="text-faint self-end font-mono text-[11px] underline underline-offset-2"
+          className="text-faint cursor-pointer self-end font-mono text-[11px] underline underline-offset-2"
         >
           목데이터로 미리보기 (API 호출 없음)
         </button>

@@ -65,7 +65,7 @@ export function FeedbackPanel() {
           type="button"
           disabled={!canRequestFeedback}
           onClick={handleClick}
-          className="text-muted-foreground border-line rounded-md border px-4 py-1.5 font-mono text-xs disabled:cursor-not-allowed disabled:opacity-50"
+          className="text-muted-foreground border-line cursor-pointer rounded-md border px-4 py-1.5 font-mono text-xs disabled:cursor-not-allowed disabled:opacity-50"
         >
           {feedbackStatus === "loading" || feedbackStatus === "streaming" ? "받는 중..." : "피드백 받기"}
         </button>
