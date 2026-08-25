@@ -3,12 +3,20 @@
 import { useMemo, useState } from "react";
 
 import { CONCEPT_SUGGESTIONS } from "@/features/prompt-builder/lib/options";
+import { cn } from "@/shared/lib/utils";
 import { usePromptBuilderStore } from "@/store/prompt-builder-store";
+
+const LISTBOX_ID = "concept-suggestions";
+
+function optionId(index: number) {
+  return `${LISTBOX_ID}-option-${index}`;
+}
 
 export function ConceptStep() {
   const concept = usePromptBuilderStore((state) => state.concept);
   const setConcept = usePromptBuilderStore((state) => state.setConcept);
   const [isFocused, setIsFocused] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(-1);
 
   const suggestions = useMemo(() => {
     const query = concept.trim().toLowerCase();
@@ -19,6 +27,31 @@ export function ConceptStep() {
   }, [concept]);
 
   const showSuggestions = isFocused && suggestions.length > 0;
+
+  const selectSuggestion = (item: string) => {
+    setConcept(item);
+    setActiveIndex(-1);
+  };
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!showSuggestions) return;
+
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+      setActiveIndex((current) => (current + 1) % suggestions.length);
+    } else if (event.key === "ArrowUp") {
+      event.preventDefault();
+      setActiveIndex((current) => (current - 1 + suggestions.length) % suggestions.length);
+    } else if (event.key === "Enter") {
+      if (activeIndex >= 0) {
+        event.preventDefault();
+        selectSuggestion(suggestions[activeIndex]);
+      }
+    } else if (event.key === "Escape") {
+      setActiveIndex(-1);
+      setIsFocused(false);
+    }
+  };
 
   return (
     <div className="flex flex-col gap-3">
@@ -35,23 +68,46 @@ export function ConceptStep() {
           <span className="text-primary font-mono text-xl font-semibold">&gt;</span>
           <input
             type="text"
+            role="combobox"
+            aria-expanded={showSuggestions}
+            aria-controls={LISTBOX_ID}
+            aria-activedescendant={activeIndex >= 0 ? optionId(activeIndex) : undefined}
+            autoComplete="off"
             value={concept}
-            onChange={(event) => setConcept(event.target.value)}
+            onChange={(event) => {
+              setConcept(event.target.value);
+              setActiveIndex(-1);
+            }}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
+            onKeyDown={handleKeyDown}
             placeholder="배운 기술/개념을 짧게 입력하세요 (예: useEffect, 이벤트 버블링)"
             className="placeholder:text-faint w-full bg-transparent font-mono text-base outline-none"
           />
         </div>
         {showSuggestions && (
-          <ul className="border-line bg-card absolute inset-x-0 top-full z-10 mt-1 overflow-hidden rounded-md border shadow-sm">
+          <ul
+            id={LISTBOX_ID}
+            role="listbox"
+            className="border-line bg-card absolute inset-x-0 top-full z-10 mt-1 overflow-hidden rounded-md border shadow-sm"
+          >
             {suggestions.map((item, index) => (
-              <li key={item}>
+              <li
+                key={item}
+                id={optionId(index)}
+                role="option"
+                aria-selected={index === activeIndex}
+              >
                 <button
                   type="button"
+                  tabIndex={-1}
                   onMouseDown={(event) => event.preventDefault()}
-                  onClick={() => setConcept(item)}
-                  className="font-option hover:bg-selection text-foreground flex w-full items-center gap-2.5 px-4 py-2 text-left text-sm"
+                  onClick={() => selectSuggestion(item)}
+                  onMouseEnter={() => setActiveIndex(index)}
+                  className={cn(
+                    "font-option text-foreground flex w-full items-center gap-2.5 px-4 py-2 text-left text-sm",
+                    index === activeIndex ? "bg-selection" : "hover:bg-selection",
+                  )}
                 >
                   <span className="text-faint font-mono text-xs">{index + 1}</span>
                   {item}
