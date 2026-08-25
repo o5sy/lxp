@@ -192,6 +192,7 @@ export function ConceptStep() {
             aria-controls={LISTBOX_ID}
             aria-activedescendant={activeIndex >= 0 ? optionId(activeIndex) : undefined}
             autoComplete="off"
+            spellCheck={false}
             value={concept}
             onChange={handleChange}
             onCompositionStart={() => {
