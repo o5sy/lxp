@@ -104,29 +104,34 @@ export function ConceptStep() {
             role="listbox"
             className="border-line bg-card absolute inset-x-0 top-full z-10 mt-1 overflow-hidden rounded-md border shadow-sm"
           >
-            {suggestions.map((item, index) => (
-              <li
-                key={item}
-                id={optionId(index)}
-                role="option"
-                aria-selected={index === activeIndex}
-              >
-                <button
-                  type="button"
-                  tabIndex={-1}
-                  onMouseDown={(event) => event.preventDefault()}
-                  onClick={() => selectSuggestion(item)}
-                  onMouseEnter={() => setActiveIndex(index)}
-                  className={cn(
-                    "font-option text-foreground flex w-full items-center gap-2.5 px-4 py-2 text-left text-sm",
-                    index === activeIndex ? "bg-selection" : "hover:bg-selection",
-                  )}
-                >
-                  <span className="text-faint font-mono text-xs">{index + 1}</span>
-                  {item}
-                </button>
-              </li>
-            ))}
+            {suggestions.map((item, index) => {
+              const active = index === activeIndex;
+              return (
+                <li key={item} id={optionId(index)} role="option" aria-selected={active}>
+                  <button
+                    type="button"
+                    tabIndex={-1}
+                    onMouseDown={(event) => event.preventDefault()}
+                    onClick={() => selectSuggestion(item)}
+                    onMouseEnter={() => setActiveIndex(index)}
+                    className={cn(
+                      "font-option text-foreground flex w-full items-center gap-2.5 px-4 py-2 text-left text-sm",
+                      active ? "bg-selection" : "hover:bg-selection",
+                    )}
+                  >
+                    <span
+                      className={cn(
+                        "font-mono text-xs",
+                        active ? "text-primary font-semibold" : "text-faint",
+                      )}
+                    >
+                      {active ? ">" : index + 1}
+                    </span>
+                    {item}
+                  </button>
+                </li>
+              );
+            })}
           </ul>
         )}
       </div>
