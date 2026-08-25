@@ -55,6 +55,16 @@ export function ConceptStep() {
     setActiveIndex(-1);
   };
 
+  // 아직 확정하지 않은(선택된) 인라인 제안을 거절하고, 실제로 타이핑한
+  // 부분까지만 남긴다. Esc뿐 아니라 포커스 아웃(다른 곳 클릭 등)도 같은
+  // "확정 안 함" 의사로 취급한다 - 그냥 두면 제안이 그대로 값으로 굳어버린다.
+  const rejectGhost = (input: HTMLInputElement) => {
+    const typedLength = input.selectionStart ?? input.value.length;
+    suppressGhostRef.current = true;
+    setConcept(input.value.slice(0, typedLength));
+    setIsGhostShown(false);
+  };
+
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const input = event.currentTarget;
     const rawValue = input.value;
@@ -137,10 +147,7 @@ export function ConceptStep() {
     } else if (event.key === "Escape") {
       if (hasGhostSelection) {
         event.preventDefault();
-        const typedLength = input.selectionStart ?? input.value.length;
-        suppressGhostRef.current = true;
-        setConcept(input.value.slice(0, typedLength));
-        setIsGhostShown(false);
+        rejectGhost(input);
         return;
       }
       if (showSuggestions) {
@@ -180,7 +187,13 @@ export function ConceptStep() {
               isComposingRef.current = false;
             }}
             onFocus={() => setIsOpen(true)}
-            onBlur={() => setIsOpen(false)}
+            onBlur={(event) => {
+              const input = event.currentTarget;
+              if (input.selectionStart !== input.selectionEnd) {
+                rejectGhost(input);
+              }
+              setIsOpen(false);
+            }}
             onKeyDown={handleKeyDown}
             placeholder="배운 기술/개념을 짧게 입력하세요 (예: useEffect, 이벤트 버블링)"
             className={cn(
