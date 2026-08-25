@@ -5,6 +5,8 @@ import { useEffect } from "react";
 
 import { generatePractice } from "@/features/prompt-builder/lib/generate-practice";
 import { InstructionPanel } from "@/features/feedback-panel/components/instruction-panel";
+import { useResizablePanel } from "@/shared/hooks/use-resizable-panel";
+import { ResizeHandle } from "@/shared/ui/resize-handle";
 import { usePromptBuilderStore } from "@/store/prompt-builder-store";
 
 const SandpackSession = dynamic(
@@ -25,6 +27,8 @@ export default function PracticeSessionPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const instructionPane = useResizablePanel({ axis: "horizontal", initialSize: 320, min: 240, max: 560 });
+
   return (
     <div className="bg-background flex h-screen flex-col">
       <header className="bg-titlebar border-line flex h-11 shrink-0 items-center border-b px-4">
@@ -32,9 +36,17 @@ export default function PracticeSessionPage() {
       </header>
 
       <div className="flex flex-1 overflow-hidden">
-        <div className="border-line w-[320px] shrink-0 border-r">
+        <div style={{ width: instructionPane.size }} className="border-line shrink-0 overflow-hidden border-r">
           <InstructionPanel />
         </div>
+
+        <ResizeHandle
+          axis="horizontal"
+          isDragging={instructionPane.isDragging}
+          onPointerDown={instructionPane.handlePointerDown}
+          onPointerMove={instructionPane.handlePointerMove}
+          onPointerUp={instructionPane.handlePointerUp}
+        />
 
         <SandpackSession />
       </div>
