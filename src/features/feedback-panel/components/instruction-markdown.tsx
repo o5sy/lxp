@@ -7,7 +7,7 @@ import { Check } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
-import { markdownProseComponents } from "@/shared/ui/markdown-content";
+import { MarkdownCode, markdownProseComponents } from "@/shared/ui/markdown-content";
 import { cn } from "@/shared/lib/utils";
 
 type InstructionMarkdownProps = {
@@ -52,6 +52,21 @@ function SectionHeading({ children }: { children?: ReactNode }) {
 
 function PlainList({ children }: { children?: ReactNode }) {
   return <ul className="mb-4 space-y-2 last:mb-0">{children}</ul>;
+}
+
+/**
+ * 실습 목표~완료 기준 구역(bg-sunken)에서는 코드 배경도 기본값(bg-sunken)을
+ * 쓰면 컨테이너 배경과 같은 색이라 코드가 안 보인다 — 흰 배경으로 덮어써서
+ * 대비를 만든다.
+ */
+function ZoneCode(props: { className?: string; children?: ReactNode }) {
+  return <MarkdownCode {...props} background="bg-background" />;
+}
+
+function ZonePre({ children }: { children?: ReactNode }) {
+  return (
+    <pre className="bg-background border-line mb-3 overflow-x-auto rounded-md border p-3 last:mb-0">{children}</pre>
+  );
 }
 
 /**
@@ -156,7 +171,14 @@ export function InstructionMarkdown({ content, header, isStreaming }: Instructio
                 ) : (
                   <ReactMarkdown
                     remarkPlugins={[remarkGfm]}
-                    components={{ ...markdownProseComponents, h2: SectionHeading, ul: PlainList, li: PlainListItem }}
+                    components={{
+                      ...markdownProseComponents,
+                      h2: SectionHeading,
+                      ul: PlainList,
+                      li: PlainListItem,
+                      code: ZoneCode,
+                      pre: ZonePre,
+                    }}
                   >
                     {section.markdown}
                   </ReactMarkdown>
@@ -192,6 +214,8 @@ function ChecklistSection({ markdown }: { markdown: string }) {
         ...markdownProseComponents,
         h2: SectionHeading,
         ul: PlainList,
+        code: ZoneCode,
+        pre: ZonePre,
         li: ({ children }) => {
           const index = nextIndex++;
           const isChecked = checked[index] ?? false;

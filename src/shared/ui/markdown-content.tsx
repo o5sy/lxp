@@ -54,7 +54,17 @@ function MarkdownHeading({ children }: { children?: ReactNode }) {
   );
 }
 
-export function MarkdownCode({ className, children }: { className?: string; children?: ReactNode }) {
+export function MarkdownCode({
+  className,
+  children,
+  background = "bg-sunken",
+}: {
+  className?: string;
+  children?: ReactNode;
+  /** 코드 칩 배경 토큰. 부모 컨테이너가 이미 bg-sunken이면(예: 지시문의 실습
+   * 목표~완료 기준 구역) 다른 값으로 덮어써서 코드가 배경에 묻히지 않게 한다. */
+  background?: string;
+}) {
   const text = String(children).replace(/\n$/, "");
   const isBlock = className?.includes("language-") || text.includes("\n");
 
@@ -62,5 +72,5 @@ export function MarkdownCode({ className, children }: { className?: string; chil
     return <code className="block font-mono text-xs">{text}</code>;
   }
 
-  return <code className="bg-sunken rounded px-1 py-0.5 font-mono text-[0.85em]">{children}</code>;
+  return <code className={cn(background, "rounded px-1 py-0.5 font-mono text-[0.85em]")}>{children}</code>;
 }
