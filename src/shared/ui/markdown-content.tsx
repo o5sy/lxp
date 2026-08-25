@@ -42,7 +42,7 @@ export const markdownProseComponents: Partial<Components> = {
   ),
   code: MarkdownCode,
   pre: ({ children }) => (
-    <pre className="bg-sunken border-line mb-3 overflow-x-auto rounded-md border p-3 last:mb-0">{children}</pre>
+    <pre className="bg-primary/10 mb-3 overflow-x-auto rounded-md p-3 last:mb-0">{children}</pre>
   ),
 };
 
@@ -54,23 +54,15 @@ function MarkdownHeading({ children }: { children?: ReactNode }) {
   );
 }
 
-export function MarkdownCode({
-  className,
-  children,
-  background = "bg-sunken",
-}: {
-  className?: string;
-  children?: ReactNode;
-  /** 코드 칩 배경 토큰. 부모 컨테이너가 이미 bg-sunken이면(예: 지시문의 실습
-   * 목표~완료 기준 구역) 다른 값으로 덮어써서 코드가 배경에 묻히지 않게 한다. */
-  background?: string;
-}) {
+export function MarkdownCode({ className, children }: { className?: string; children?: ReactNode }) {
   const text = String(children).replace(/\n$/, "");
   const isBlock = className?.includes("language-") || text.includes("\n");
 
   if (isBlock) {
-    return <code className="block font-mono text-xs">{text}</code>;
+    return <code className="text-primary block font-mono text-xs">{text}</code>;
   }
 
-  return <code className={cn(background, "rounded px-1 py-0.5 font-mono text-[0.85em]")}>{children}</code>;
+  return (
+    <code className="bg-primary/10 text-primary rounded px-1 py-0.5 font-mono text-[0.85em]">{children}</code>
+  );
 }
