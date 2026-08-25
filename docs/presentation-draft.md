@@ -146,6 +146,155 @@
 - 영상 파일은 용량이 크므로 이 저장소(git)에 커밋하지 않는다 — 로컬 폴더나 슬라이드 파일(Keynote/PowerPoint/Google Slides)에 직접 삽입해서 보관한다. `docs/presentation-draft.md`에는 파일 저장 경로만 메모해두면 충분하다.
 - 슬라이드에는 라이브 데모용 브라우저 탭과 백업 영상을 같은 화면(또는 다음 슬라이드)에 미리 심어둬서, 전환 시 탭만 바꾸면 되게 준비한다 — 전환 자체가 어색하게 오래 걸리지 않도록.
 
+### 실제 편집 기록 (2026-08-26, 다른 컴퓨터에서 원본으로 재현하기)
+
+실제로는 위 "편집은 최소한으로" 원칙에서 한 단계 더 나아가, 코드 타이핑/읽기 구간만 배속을 걸고(실시간 API 대기 구간은 그대로 뒀다 — 원칙과 모순 아님), 자막까지 구웠다. 원본 녹화본(`Screen Recording 2026-08-26 at 4.11.43 AM.mov`, 240초, 60fps, 1394×954, 영상 트랙만 있고 오디오 없음)만 있으면 다른 컴퓨터에서도 아래 그대로 재현 가능하다.
+
+**0. 사전 준비 (최초 1회)**
+
+기본 `ffmpeg`에는 자막(`drawtext`) 필터가 빠져 있어 별도 빌드가 필요하다:
+
+```bash
+brew install ffmpeg        # 트림/배속용 (자막 없이도 이걸로 충분)
+brew install ffmpeg-full   # drawtext(자막) 필터 포함, keg-only라 기존 ffmpeg와 충돌 없음
+# 자막 작업엔 반드시 아래 경로로 직접 호출:
+#   /opt/homebrew/opt/ffmpeg-full/bin/ffmpeg
+```
+
+**주의 (실제로 겪은 사고):** `brew install ffmpeg`가 의존성 정리 과정에서 `ripgrep`을 autoremove로 같이 지운 적이 있다 — 설치 후 `rg --version`으로 확인하고, 없으면 `brew install ripgrep`으로 바로 복구할 것.
+
+**1. 확정된 편집 파라미터**
+
+| 구간(원본 타임코드) | 처리 | 근거 |
+|---|---|---|
+| 0–52초 | 원속도 유지 | 빌더 3스텝 + 제출 + 생성 스트리밍 시작 |
+| 52–200초 (148초) | **5배속 → 29.6초** | 코드 읽고 타이핑하는 구간(중간에 문법 에러·완료조건 미충족 테스트 포함, 실제로 느슨해서 배속 대상) |
+| 200–236초 (36초) | 원속도 유지 | 피드백 요청 → 로딩 → `✅ 완료 기준 충족` 배지 확정(하이라이트라 그대로 둠) |
+| 236–240초 | **삭제** | 화면 녹화 정지 버튼 UI가 화면에 잡힘 |
+
+배속 배율은 3배속(v2, 2:17) → 5배속(v3/최종, 1:58) 순으로 시도해서 확정했다. 시간을 재계산하려면:
+
+```python
+def edited_to_original(e, seg1=52, seg2_end=200, speed=5):
+    if e <= seg1:
+        return e
+    elif e <= seg1 + (seg2_end - seg1) / speed:
+        return seg1 + (e - seg1) * speed
+    else:
+        return seg2_end + (e - (seg1 + (seg2_end - seg1) / speed))
+```
+
+**2. 트림 + 배속 (자막 없는 버전, 원본에서 한 번에)**
+
+항상 **원본(raw)에서 매번 다시 렌더링**한다 — 이미 인코딩된 파일을 또 자르면 화질이 누적 손실된다.
+
+```bash
+RAW="Screen Recording 2026-08-26 at 4.11.43 AM.mov"   # 원본 경로로 교체
+OUT="demo-edited.mp4"
+
+ffmpeg -y -i "$RAW" -filter_complex \
+"[0:v]trim=start=0:end=52,setpts=PTS-STARTPTS[v1]; \
+ [0:v]trim=start=52:end=200,setpts=(PTS-STARTPTS)/5[v2]; \
+ [0:v]trim=start=200:end=236,setpts=PTS-STARTPTS[v3]; \
+ [v1][v2][v3]concat=n=3:v=1:a=0[outv]" \
+-map "[outv]" -c:v libx264 -pix_fmt yuv420p -crf 18 -preset medium "$OUT"
+```
+
+**3. 자막 + 배속 배지 (최종본, `ffmpeg-full` 필요)**
+
+자막은 3줄 구조(스텝 / 무엇을 하는지 / 부가설명(옵션))로, 아래 표의 타이밍·문구 그대로 `drawtext`로 굽는다. STEP 6·7은 화면 좌하단의 실제 "완료 기준" 체크리스트를 가리지 않도록 좌표를 화면 중간(x=340, y=380~460)으로 올렸고, 나머지는 좌하단(x=40)에 둔다.
+
+| # | 편집본 타임코드 | STEP 제목 | 무엇을 하는지 | 부가설명 | 좌표 |
+|---|---|---|---|---|---|
+| 1 | 0:00–0:08 | STEP 1 - 개념 입력 | 배운 개념을 입력, 자동완성 제안 | 키워드 추천 + Tab 키로 자동완성 선택 (키보드 접근성) | 좌하단 |
+| 2 | 0:08–0:20 | STEP 2 - 목표 선택 | 이해 / 적용 / 종합 중 하나 선택 | 일부러 키보드로만 조작해서 접근성 확인 | 좌하단 |
+| 3 | 0:20–0:36 | STEP 3 - 추가 설명 (선택) | 더 구체적인 상황을 한 줄로 입력 | (없음) | 좌하단 |
+| 4 | 0:36–0:53 | STEP 4 - 생성, 스트리밍 | 서버가 프롬프트를 조립해 토큰 단위로 실습 생성 | (없음) | 좌하단 |
+| 5 | 0:53–1:22 | STEP 5 - 실습 진행 | 같은 화면에서 코드 작성과 실행 | 코드 작성 후 잠시 뒤 실행 결과가 자동 반영됨 | 좌하단 (+ 이 구간에 "5x 배속" 배지, 우상단) |
+| 6 | 1:22–1:52 | STEP 6 - 피드백 받기 | 완료 기준 충족 여부 확인 | 정답 대신 관찰 설명 + 다음 질문 (멘토링 톤) | **중간** |
+| 7 | 1:52–1:58 | STEP 7 - 완료 판정 | 완료 기준 충족 여부 자동 판정 | (없음) | **중간** |
+
+폰트는 한글 지원을 위해 `/System/Library/Fonts/AppleSDGothicNeo.ttc`를 명시했다(기본 폰트는 한글이 깨짐/tofu). 실제 실행한 필터 그래프 생성 스크립트:
+
+```python
+FONT = "/System/Library/Fonts/AppleSDGothicNeo.ttc"
+
+def esc(s):
+    return s.replace("\\", "\\\\").replace(":", "\\:").replace("'", "\\'")
+
+# (start, end, title, what, extra_or_None, raised)
+steps = [
+    (0,   8,  "STEP 1 - 개념 입력", "배운 개념을 입력, 자동완성 제안",
+              "키워드 추천 + Tab 키로 자동완성 선택 (키보드 접근성)", False),
+    (8,   20, "STEP 2 - 목표 선택", "이해 / 적용 / 종합 중 하나 선택",
+              "일부러 키보드로만 조작해서 접근성 확인", False),
+    (20,  36, "STEP 3 - 추가 설명 (선택)", "더 구체적인 상황을 한 줄로 입력", None, False),
+    (36,  53, "STEP 4 - 생성, 스트리밍", "서버가 프롬프트를 조립해 토큰 단위로 실습 생성", None, False),
+    (53,  82, "STEP 5 - 실습 진행", "같은 화면에서 코드 작성과 실행",
+              "코드 작성 후 잠시 뒤 실행 결과가 자동 반영됨", False),
+    (82, 112, "STEP 6 - 피드백 받기", "완료 기준 충족 여부 확인",
+              "정답 대신 관찰 설명 + 다음 질문 (멘토링 톤)", True),
+    (112,118, "STEP 7 - 완료 판정", "완료 기준 충족 여부 자동 판정", None, True),
+]
+
+parts, label_in, idx = [], "[outv]", 0
+for start, end, title, what, extra, raised in steps:
+    idx += 1
+    x = "40" if not raised else "340"
+    y_title, y_what, y_extra = ("h-150", "h-108", "h-68") if not raised else ("380", "422", "460")
+
+    lbl = f"[c{idx}a]"
+    parts.append(f"{label_in}drawtext=fontfile={FONT}:text='{esc(title)}':fontcolor=white:fontsize=30:"
+                  f"borderw=2:bordercolor=black@0.8:box=1:boxcolor=black@0.6:boxborderw=12:"
+                  f"x={x}:y={y_title}:enable='between(t,{start},{end})'{lbl}")
+    label_in = lbl
+
+    lbl = f"[c{idx}b]"
+    parts.append(f"{label_in}drawtext=fontfile={FONT}:text='{esc(what)}':fontcolor=white@0.95:fontsize=21:"
+                  f"borderw=1:bordercolor=black@0.8:box=1:boxcolor=black@0.6:boxborderw=10:"
+                  f"x={x}:y={y_what}:enable='between(t,{start},{end})'{lbl}")
+    label_in = lbl
+
+    if extra:
+        lbl = f"[c{idx}c]"
+        parts.append(f"{label_in}drawtext=fontfile={FONT}:text='{esc(extra)}':fontcolor=0xBFEAFF:fontsize=17:"
+                      f"borderw=1:bordercolor=black@0.8:box=1:boxcolor=black@0.55:boxborderw=8:"
+                      f"x={x}:y={y_extra}:enable='between(t,{start},{end})'{lbl}")
+        label_in = lbl
+
+# 5배속 구간(편집본 0:52~1:22)에만 노란 "5x 배속" 배지, 우상단
+parts.append(f"{label_in}drawtext=fontfile={FONT}:text='5x 배속':fontcolor=yellow:fontsize=28:"
+              f"borderw=2:bordercolor=black@0.9:box=1:boxcolor=black@0.6:boxborderw=10:"
+              f"x=w-tw-30:y=30:enable='between(t,52,82)'[vout]")
+
+open("full.filter", "w").write(";\n".join(parts))
+```
+
+렌더링(트림+배속 필터를 앞에 붙이고, `-map "[vout]"`로 출력):
+
+```bash
+FF=/opt/homebrew/opt/ffmpeg-full/bin/ffmpeg
+{
+  echo "[0:v]trim=start=0:end=52,setpts=PTS-STARTPTS[v1];"
+  echo "[0:v]trim=start=52:end=200,setpts=(PTS-STARTPTS)/5[v2];"
+  echo "[0:v]trim=start=200:end=236,setpts=PTS-STARTPTS[v3];"
+  echo "[v1][v2][v3]concat=n=3:v=1:a=0[outv];"
+  cat full.filter
+} > full_combined.filter
+
+"$FF" -y -i "$RAW" -filter_complex "$(cat full_combined.filter)" \
+  -map "[vout]" -c:v libx264 -pix_fmt yuv420p -crf 18 -preset medium demo-captioned.mp4
+```
+
+**4. 산출물 (git엔 없음, 위 절차로 언제든 재생성 가능)**
+
+- `demo-edited.mp4` (자막 없음, 1:58, 5MB)
+- `demo-captioned.mp4` (자막+배속배지 최종본, 1:58, 5MB) — **이게 실제 배포용**
+
+**5. 남은 일 (라이트모드)**
+
+이 녹화본에는 라이트모드 전환 장면이 없음(계속 다크모드). 라이트모드 전환을 별도로 촬영하면, 그 구간에 STEP 8 자막("STEP 8 - 라이트모드" 등)을 같은 방식으로 추가한다.
+
 ---
 
 ## S3. 설계 결정 (목표 30~40초)
