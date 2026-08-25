@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 import { BUILDER_STEP_LABELS } from "@/features/prompt-builder/lib/options";
 import { StepRail } from "@/shared/ui/step-rail";
@@ -31,7 +32,10 @@ export function PromptBuilderPanel() {
   const canGoNext =
     (step === 1 && concept.trim().length > 0) || (step === 2 && stage !== null) || step === 3;
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const handleSubmit = () => {
+    setIsSubmitting(true);
     router.push(`/practice/${slugify(concept)}`);
   };
 
@@ -73,10 +77,11 @@ export function PromptBuilderPanel() {
         ) : (
           <button
             type="button"
+            disabled={isSubmitting}
             onClick={handleSubmit}
-            className="bg-primary text-primary-foreground rounded-md px-4 py-2 font-mono text-xs font-medium"
+            className="bg-primary text-primary-foreground rounded-md px-4 py-2 font-mono text-xs font-medium disabled:cursor-not-allowed disabled:opacity-50"
           >
-            실습 생성하기 →
+            {isSubmitting ? "생성하는 중..." : "실습 생성하기 →"}
           </button>
         )}
       </div>
