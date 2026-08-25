@@ -1,6 +1,12 @@
 "use client";
 
-import { SandpackCodeEditor, SandpackPreview, SandpackProvider, useSandpack } from "@codesandbox/sandpack-react";
+import {
+  SandpackCodeEditor,
+  SandpackLayout,
+  SandpackPreview,
+  SandpackProvider,
+  useSandpack,
+} from "@codesandbox/sandpack-react";
 import { useEffect, useRef } from "react";
 
 import { FeedbackPanel } from "@/features/feedback-panel/components/feedback-panel";
@@ -43,24 +49,22 @@ export function SandpackSession() {
       className="sandpack-session-wrapper flex min-w-0 flex-1 flex-col overflow-hidden"
     >
       <CodeSync />
-      <div className="border-line relative flex min-h-0 flex-1 overflow-hidden border-b">
-        <div style={{ width: editorPane.size }} className="min-w-0 shrink-0 overflow-hidden">
+      <div className="border-line relative min-h-0 flex-1 overflow-hidden border-b">
+        <SandpackLayout style={{ height: "100%" }}>
           <SandpackCodeEditor
             showLineNumbers
             readOnly={!starterCode}
-            style={{ height: "100%", width: "100%" }}
+            style={{ height: "100%", flexGrow: 0, flexShrink: 0, flexBasis: editorPane.size }}
           />
-        </div>
-        <ResizeHandle
-          axis="horizontal"
-          isDragging={editorPane.isDragging}
-          onPointerDown={editorPane.handlePointerDown}
-          onPointerMove={editorPane.handlePointerMove}
-          onPointerUp={editorPane.handlePointerUp}
-        />
-        <div className="min-w-0 flex-1 overflow-hidden">
-          <SandpackPreview style={{ height: "100%", width: "100%" }} />
-        </div>
+          <ResizeHandle
+            axis="horizontal"
+            isDragging={editorPane.isDragging}
+            onPointerDown={editorPane.handlePointerDown}
+            onPointerMove={editorPane.handlePointerMove}
+            onPointerUp={editorPane.handlePointerUp}
+          />
+          <SandpackPreview style={{ height: "100%", flexGrow: 1, flexShrink: 1, flexBasis: 0, minWidth: 0 }} />
+        </SandpackLayout>
         {!starterCode && (
           <div className="bg-sunken/90 absolute inset-0 flex items-center justify-center">
             <p className="text-muted-foreground text-sm">
