@@ -122,7 +122,7 @@ export function InstructionMarkdown({ content, header, isStreaming }: Instructio
 
       <div ref={scrollRef} className="flex-1 overflow-y-auto">
         {overview?.markdown.trim() && (
-          <div id={OVERVIEW_ID} className="text-foreground px-6 pt-2 pb-4 text-sm leading-relaxed">
+          <div id={OVERVIEW_ID} className="text-foreground scroll-mt-6 px-6 pt-2 pb-4 text-sm leading-relaxed">
             <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownProseComponents}>
               {overview.markdown}
             </ReactMarkdown>
@@ -132,7 +132,11 @@ export function InstructionMarkdown({ content, header, isStreaming }: Instructio
         {headedSections.length > 0 && (
           <div className="bg-sunken text-foreground px-6 py-6 text-sm leading-relaxed">
             {headedSections.map((section, index) => (
-              <div key={section.heading} id={section.heading ? HEADED_SECTION_IDS[section.heading] : undefined} className={index > 0 ? "mt-6" : undefined}>
+              <div
+                key={section.heading}
+                id={section.heading ? HEADED_SECTION_IDS[section.heading] : undefined}
+                className={cn("scroll-mt-6", index > 0 && "mt-6")}
+              >
                 {section.heading === "완료 기준" ? (
                   <ChecklistSection markdown={section.markdown} />
                 ) : (
