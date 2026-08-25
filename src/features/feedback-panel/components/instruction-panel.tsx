@@ -1,13 +1,12 @@
 "use client";
 
 import { InstructionMarkdown } from "@/features/feedback-panel/components/instruction-markdown";
-import { PCML_STAGES } from "@/features/prompt-builder/lib/options";
+import { PRACTICE_DIFFICULTIES } from "@/features/prompt-builder/lib/options";
 import { usePromptBuilderStore } from "@/store/prompt-builder-store";
 
 export function InstructionPanel() {
   const concept = usePromptBuilderStore((state) => state.concept);
-  const stage = usePromptBuilderStore((state) => state.stage);
-  const situationTags = usePromptBuilderStore((state) => state.situationTags);
+  const difficulty = usePromptBuilderStore((state) => state.difficulty);
   const freeText = usePromptBuilderStore((state) => state.freeText);
   const generationStatus = usePromptBuilderStore((state) => state.generationStatus);
   const instruction = usePromptBuilderStore((state) => state.instruction);
@@ -15,10 +14,8 @@ export function InstructionPanel() {
   const feedbackRounds = usePromptBuilderStore((state) => state.feedbackRounds);
   const criteriaChecks = feedbackRounds.at(-1)?.criteriaChecks ?? null;
 
-  const stageOption = PCML_STAGES.find((option) => option.value === stage);
-  const summary = [concept, stageOption && `${stageOption.stageName} 단계`, ...situationTags]
-    .filter(Boolean)
-    .join(" · ");
+  const difficultyOption = PRACTICE_DIFFICULTIES.find((option) => option.value === difficulty);
+  const summary = [concept, difficultyOption?.title].filter(Boolean).join(" · ");
 
   const header = (
     <>

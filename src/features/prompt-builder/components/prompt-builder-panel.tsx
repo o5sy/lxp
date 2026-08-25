@@ -9,8 +9,7 @@ import { TOTAL_BUILDER_STEPS, usePromptBuilderStore } from "@/store/prompt-build
 
 import { ConceptStep } from "./concept-step";
 import { DetailStep } from "./detail-step";
-import { SituationStep } from "./situation-step";
-import { StageStep } from "./stage-step";
+import { DifficultyStep } from "./difficulty-step";
 
 function slugify(concept: string) {
   const slug = concept
@@ -25,12 +24,11 @@ export function PromptBuilderPanel() {
   const router = useRouter();
   const step = usePromptBuilderStore((state) => state.step);
   const concept = usePromptBuilderStore((state) => state.concept);
-  const stage = usePromptBuilderStore((state) => state.stage);
+  const difficulty = usePromptBuilderStore((state) => state.difficulty);
   const goNext = usePromptBuilderStore((state) => state.goNext);
   const goBack = usePromptBuilderStore((state) => state.goBack);
 
-  const canGoNext =
-    (step === 1 && concept.trim().length > 0) || (step === 2 && stage !== null) || step === 3;
+  const canGoNext = (step === 1 && concept.trim().length > 0) || (step === 2 && difficulty !== null);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -48,9 +46,8 @@ export function PromptBuilderPanel() {
       />
 
       {step === 1 && <ConceptStep />}
-      {step === 2 && <StageStep />}
-      {step === 3 && <SituationStep />}
-      {step === 4 && <DetailStep />}
+      {step === 2 && <DifficultyStep />}
+      {step === 3 && <DetailStep />}
 
       <div className="mt-1 flex justify-between">
         {step > 1 ? (

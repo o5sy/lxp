@@ -2,11 +2,11 @@ import { create } from "zustand";
 
 import type { FeedbackCriterionCheck } from "@/lib/llm/types";
 
-export type PcmlStage = "recall" | "apply" | "explain";
+export type PracticeDifficulty = "typing" | "apply" | "stretch";
 
 export type AsyncStatus = "idle" | "loading" | "streaming" | "done" | "error";
 
-export const TOTAL_BUILDER_STEPS = 4;
+export const TOTAL_BUILDER_STEPS = 3;
 
 export type FeedbackRound = {
   feedback: string;
@@ -16,12 +16,10 @@ export type FeedbackRound = {
 type PromptBuilderState = {
   step: number;
   concept: string;
-  stage: PcmlStage | null;
-  situationTags: string[];
+  difficulty: PracticeDifficulty | null;
   freeText: string;
   setConcept: (concept: string) => void;
-  setStage: (stage: PcmlStage) => void;
-  toggleSituationTag: (tag: string) => void;
+  setDifficulty: (difficulty: PracticeDifficulty) => void;
   setFreeText: (freeText: string) => void;
   goNext: () => void;
   goBack: () => void;
@@ -50,22 +48,14 @@ type PromptBuilderState = {
 export const usePromptBuilderStore = create<PromptBuilderState>((set) => ({
   step: 1,
   concept: "",
-  stage: null,
-  situationTags: [],
+  difficulty: null,
   freeText: "",
   setConcept: (concept) => set({ concept }),
-  setStage: (stage) => set({ stage }),
-  toggleSituationTag: (tag) =>
-    set((state) => ({
-      situationTags: state.situationTags.includes(tag)
-        ? state.situationTags.filter((t) => t !== tag)
-        : [...state.situationTags, tag],
-    })),
+  setDifficulty: (difficulty) => set({ difficulty }),
   setFreeText: (freeText) => set({ freeText }),
   goNext: () => set((state) => ({ step: Math.min(state.step + 1, TOTAL_BUILDER_STEPS) })),
   goBack: () => set((state) => ({ step: Math.max(state.step - 1, 1) })),
-  reset: () =>
-    set({ step: 1, concept: "", stage: null, situationTags: [], freeText: "" }),
+  reset: () => set({ step: 1, concept: "", difficulty: null, freeText: "" }),
 
   generationStatus: "idle",
   instruction: "",

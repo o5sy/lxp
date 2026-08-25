@@ -13,8 +13,8 @@ function sseEvent(event: string, data: string) {
 export async function POST(request: Request) {
   const input = (await request.json()) as PracticeGenerationInput;
 
-  if (!input.concept?.trim() || !input.stage) {
-    return new Response("concept과 stage는 필수입니다.", { status: 400 });
+  if (!input.concept?.trim() || !input.difficulty) {
+    return new Response("concept과 difficulty는 필수입니다.", { status: 400 });
   }
 
   const { system, prompt } = buildPracticePrompt(input);

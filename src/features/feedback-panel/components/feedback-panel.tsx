@@ -28,7 +28,7 @@ function FeedbackVerdictBadge({ round }: { round: FeedbackRound }) {
 export function FeedbackPanel() {
   const { code } = useActiveCode();
   const concept = usePromptBuilderStore((state) => state.concept);
-  const stage = usePromptBuilderStore((state) => state.stage);
+  const difficulty = usePromptBuilderStore((state) => state.difficulty);
   const instruction = usePromptBuilderStore((state) => state.instruction);
   const generationStatus = usePromptBuilderStore((state) => state.generationStatus);
   const feedbackStatus = usePromptBuilderStore((state) => state.feedbackStatus);
@@ -39,7 +39,10 @@ export function FeedbackPanel() {
   const latestRoundRef = useRef<HTMLDivElement>(null);
 
   const canRequestFeedback =
-    generationStatus === "done" && stage !== null && feedbackStatus !== "loading" && feedbackStatus !== "streaming";
+    generationStatus === "done" &&
+    difficulty !== null &&
+    feedbackStatus !== "loading" &&
+    feedbackStatus !== "streaming";
 
   useEffect(() => {
     if (feedbackStatus === "done") {
@@ -50,8 +53,8 @@ export function FeedbackPanel() {
   }, [feedbackRounds, feedbackStatus]);
 
   const handleClick = () => {
-    if (!stage) return;
-    requestFeedback({ concept, stage, instruction, code });
+    if (!difficulty) return;
+    requestFeedback({ concept, difficulty, instruction, code });
   };
 
   return (
