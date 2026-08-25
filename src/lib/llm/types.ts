@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import type { PcmlStage } from "@/store/prompt-builder-store";
+import type { PracticeDifficulty } from "@/store/prompt-builder-store";
 
 export const practiceGenerationSchema = z.object({
   instruction: z
@@ -15,14 +15,13 @@ export type PracticeGeneration = z.infer<typeof practiceGenerationSchema>;
 
 export type PracticeGenerationInput = {
   concept: string;
-  stage: PcmlStage;
-  situationTags: string[];
+  difficulty: PracticeDifficulty;
   freeText: string;
 };
 
 export type FeedbackInput = {
   concept: string;
-  stage: PcmlStage;
+  difficulty: PracticeDifficulty;
   instruction: string;
   code: string;
 };

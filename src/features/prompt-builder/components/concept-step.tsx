@@ -286,7 +286,7 @@ export function ConceptStep() {
                     onClick={() => selectSuggestion(item)}
                     onMouseEnter={() => setActiveIndex(index)}
                     className={cn(
-                      "font-option text-foreground flex w-full items-center gap-2.5 px-4 py-2 text-left text-sm",
+                      "font-option text-foreground flex w-full cursor-pointer items-center gap-2.5 px-4 py-2 text-left text-sm",
                       active ? "bg-selection" : "hover:bg-selection",
                     )}
                   >

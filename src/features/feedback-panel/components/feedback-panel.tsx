@@ -28,7 +28,7 @@ function FeedbackVerdictBadge({ round }: { round: FeedbackRound }) {
 export function FeedbackPanel() {
   const { code } = useActiveCode();
   const concept = usePromptBuilderStore((state) => state.concept);
-  const stage = usePromptBuilderStore((state) => state.stage);
+  const difficulty = usePromptBuilderStore((state) => state.difficulty);
   const instruction = usePromptBuilderStore((state) => state.instruction);
   const generationStatus = usePromptBuilderStore((state) => state.generationStatus);
   const feedbackStatus = usePromptBuilderStore((state) => state.feedbackStatus);
@@ -39,7 +39,10 @@ export function FeedbackPanel() {
   const latestRoundRef = useRef<HTMLDivElement>(null);
 
   const canRequestFeedback =
-    generationStatus === "done" && stage !== null && feedbackStatus !== "loading" && feedbackStatus !== "streaming";
+    generationStatus === "done" &&
+    difficulty !== null &&
+    feedbackStatus !== "loading" &&
+    feedbackStatus !== "streaming";
 
   useEffect(() => {
     if (feedbackStatus === "done") {
@@ -50,8 +53,8 @@ export function FeedbackPanel() {
   }, [feedbackRounds, feedbackStatus]);
 
   const handleClick = () => {
-    if (!stage) return;
-    requestFeedback({ concept, stage, instruction, code });
+    if (!difficulty) return;
+    requestFeedback({ concept, difficulty, instruction, code });
   };
 
   return (
@@ -62,7 +65,7 @@ export function FeedbackPanel() {
           type="button"
           disabled={!canRequestFeedback}
           onClick={handleClick}
-          className="text-muted-foreground border-line rounded-md border px-4 py-1.5 font-mono text-xs disabled:cursor-not-allowed disabled:opacity-50"
+          className="text-muted-foreground border-line cursor-pointer rounded-md border px-4 py-1.5 font-mono text-xs disabled:cursor-not-allowed disabled:opacity-50"
         >
           {feedbackStatus === "loading" || feedbackStatus === "streaming" ? "받는 중..." : "피드백 받기"}
         </button>

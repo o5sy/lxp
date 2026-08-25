@@ -19,8 +19,7 @@ const SandpackSession = dynamic(
 
 export default function PracticeSessionPage() {
   const concept = usePromptBuilderStore((state) => state.concept);
-  const stage = usePromptBuilderStore((state) => state.stage);
-  const situationTags = usePromptBuilderStore((state) => state.situationTags);
+  const difficulty = usePromptBuilderStore((state) => state.difficulty);
   const freeText = usePromptBuilderStore((state) => state.freeText);
   const useMock = useSearchParams().get("mock") === "1";
 
@@ -30,8 +29,8 @@ export default function PracticeSessionPage() {
       generatePracticeMock();
       return;
     }
-    if (!concept.trim() || !stage) return;
-    generatePractice({ concept, stage, situationTags, freeText });
+    if (!concept.trim() || !difficulty) return;
+    generatePractice({ concept, difficulty, freeText });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

@@ -1,4 +1,4 @@
-import type { PcmlStage } from "@/store/prompt-builder-store";
+import type { PracticeDifficulty } from "@/store/prompt-builder-store";
 
 export const CONCEPT_SUGGESTIONS = [
   "useEffect",
@@ -33,21 +33,26 @@ export const CONCEPT_SUGGESTIONS = [
   "메모이제이션",
 ];
 
-export const PCML_STAGES: {
-  value: PcmlStage;
-  label: string;
-  stageName: string;
+export const PRACTICE_DIFFICULTIES: {
+  value: PracticeDifficulty;
+  title: string;
+  description: string;
 }[] = [
-  { value: "recall", label: "다시 설명 들으면 이해 가능", stageName: "익숙해지기" },
-  { value: "apply", label: "혼자 적용해볼 수 있음", stageName: "연결하기" },
-  { value: "explain", label: "다른 사람에게 설명 가능", stageName: "판단하기" },
+  {
+    value: "typing",
+    title: "이해",
+    description: "문법과 주요 사용법(API)에 익숙해지기",
+  },
+  {
+    value: "apply",
+    title: "적용",
+    description: "배운 개념 1개를 실전에 사용해보기",
+  },
+  {
+    value: "stretch",
+    title: "종합",
+    description: "배운 개념을 포함해 여러 지식이 필요한 요구사항 구현해보기",
+  },
 ];
 
-export const SITUATION_TAGS = [
-  "문법은 아는데 언제 쓰는지 모르겠어요",
-  "코드가 자꾸 에러나요",
-  "설명을 들어도 이해가 잘 안 가요",
-  "이미 아는데 연습만 더 하고 싶어요",
-];
-
-export const BUILDER_STEP_LABELS = ["개념 선택", "학습 단계 선택", "상황 선택", "추가 설명"];
+export const BUILDER_STEP_LABELS = ["개념 선택", "목표 선택", "추가 설명"];
