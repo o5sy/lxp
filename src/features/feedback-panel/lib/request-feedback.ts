@@ -1,8 +1,10 @@
 import type { FeedbackInput } from "@/lib/llm/types";
+import { parseSSE } from "@/shared/lib/parse-sse";
 import { usePromptBuilderStore } from "@/store/prompt-builder-store";
 
 export async function requestFeedback(input: FeedbackInput) {
-  const { startFeedback, appendFeedback, setFeedbackDone, setFeedbackError } = usePromptBuilderStore.getState();
+  const { startFeedback, appendFeedback, setFeedbackVerdict, setFeedbackDone, setFeedbackError } =
+    usePromptBuilderStore.getState();
 
   startFeedback();
 
@@ -17,16 +19,18 @@ export async function requestFeedback(input: FeedbackInput) {
       throw new Error(await response.text());
     }
 
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder();
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      appendFeedback(decoder.decode(value, { stream: true }));
+    for await (const { event, data } of parseSSE(response)) {
+      if (event === "feedback-delta") {
+        appendFeedback(data);
+      } else if (event === "verdict") {
+        const verdict = JSON.parse(data) as { criteriaMet: boolean; unmetReasons?: string[] };
+        setFeedbackVerdict(verdict.criteriaMet, verdict.unmetReasons ?? []);
+      } else if (event === "error") {
+        throw new Error(data);
+      } else if (event === "done") {
+        setFeedbackDone();
+      }
     }
-
-    setFeedbackDone();
   } catch (error) {
     setFeedbackError(error instanceof Error ? error.message : "피드백 요청에 실패했습니다.");
   }

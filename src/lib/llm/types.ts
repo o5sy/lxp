@@ -26,3 +26,18 @@ export type FeedbackInput = {
   instruction: string;
   code: string;
 };
+
+export const feedbackSchema = z.object({
+  feedback: z
+    .string()
+    .describe(
+      "마크다운 형식의 피드백 본문. 정답을 바로 알려주지 않고, 코드를 관찰한 결과를 해석해서 설명하고 학습자가 스스로 확인해볼 예측 질문을 던진다.",
+    ),
+  criteriaMet: z.boolean().describe("실습 지시문의 '완료 기준' 섹션을 학습자의 코드가 충족했는지 여부."),
+  unmetReasons: z
+    .array(z.string())
+    .optional()
+    .describe("criteriaMet이 false일 때만: 충족하지 못한 기준을 짧은 문장으로 나열. 고치는 방법은 포함하지 않는다."),
+});
+
+export type Feedback = z.infer<typeof feedbackSchema>;

@@ -32,9 +32,12 @@ type PromptBuilderState = {
 
   feedbackStatus: AsyncStatus;
   feedback: string;
+  feedbackCriteriaMet: boolean | null;
+  feedbackUnmetReasons: string[];
   feedbackError: string | null;
   startFeedback: () => void;
   appendFeedback: (delta: string) => void;
+  setFeedbackVerdict: (criteriaMet: boolean, unmetReasons: string[]) => void;
   setFeedbackDone: () => void;
   setFeedbackError: (message: string) => void;
 };
@@ -73,9 +76,14 @@ export const usePromptBuilderStore = create<PromptBuilderState>((set) => ({
 
   feedbackStatus: "idle",
   feedback: "",
+  feedbackCriteriaMet: null,
+  feedbackUnmetReasons: [],
   feedbackError: null,
-  startFeedback: () => set({ feedbackStatus: "loading", feedback: "", feedbackError: null }),
+  startFeedback: () =>
+    set({ feedbackStatus: "loading", feedback: "", feedbackCriteriaMet: null, feedbackUnmetReasons: [], feedbackError: null }),
   appendFeedback: (delta) => set((state) => ({ feedbackStatus: "streaming", feedback: state.feedback + delta })),
+  setFeedbackVerdict: (criteriaMet, unmetReasons) =>
+    set({ feedbackCriteriaMet: criteriaMet, feedbackUnmetReasons: unmetReasons }),
   setFeedbackDone: () => set({ feedbackStatus: "done" }),
   setFeedbackError: (message) => set({ feedbackStatus: "error", feedbackError: message }),
 }));
