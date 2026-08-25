@@ -19,6 +19,11 @@
   - 테스트 코드가 있다면 검증 대상 변경과 같은 커밋에 포함한다.
   - "반영 직후에도 시스템이 정상 동작해야 한다"는 기준은 개별 커밋이 아니라 **main에 머지되는 PR(스쿼시 커밋) 단위**에 적용한다 — 로컬 커밋은 배관만 먼저 깔고 나중 커밋에서 화면에 연결해도 된다.
 
+## 의존성 추가 규칙
+
+- 간단한 기능은 외부 라이브러리 없이 직접 구현하는 것을 지향한다 (예: 드래그 리사이징, 다크모드 토글처럼 수십~백여 줄 안에서 구현 가능한 것들).
+- 정말 라이브러리가 필요하다고 판단되면(구현 난이도가 높거나, 보안/접근성처럼 직접 구현 시 위험이 큰 영역), 추가하기 전에 먼저 사용자에게 물어보고 승인을 받는다.
+
 ## 사용 가능한 스킬 (slash command)
 
 `_gstack-command`, `autoplan`, `benchmark`, `benchmark-models`, `browse`, `canary`, `careful`, `codex`, `connect-chrome`, `context-restore`, `context-save`, `cso`, `design-consultation`, `design-html`, `design-review`, `design-shotgun`, `devex-review`, `diagram`, `document-generate`, `document-release`, `freeze`, `gstack-upgrade`, `guard`, `health`, `investigate`, `ios-clean`, `ios-design-review`, `ios-fix`, `ios-qa`, `ios-sync`, `land-and-deploy`, `landing-report`, `learn`, `make-pdf`, `office-hours`, `open-gstack-browser`, `pair-agent`, `plan-ceo-review`, `plan-design-review`, `plan-devex-review`, `plan-eng-review`, `plan-tune`, `qa`, `qa-only`, `retro`, `review`, `scrape`, `setup-browser-cookies`, `setup-deploy`, `setup-gbrain`, `ship`, `skillify`, `spec`, `sync-gbrain`, `unfreeze`
