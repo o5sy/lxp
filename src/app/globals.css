@@ -166,3 +166,26 @@
   min-width: 0;
   overflow: hidden;
 }
+
+/* 스크롤바는 평소엔 숨기고, hover 중인 영역에서만 얇게 보이게 한다. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+*:hover {
+  scrollbar-color: var(--line-strong) transparent;
+}
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background-color: transparent;
+  border-radius: 9999px;
+}
+*:hover::-webkit-scrollbar-thumb {
+  background-color: var(--line-strong);
+}
