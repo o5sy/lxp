@@ -226,7 +226,7 @@ function ChecklistSection({ markdown }: { markdown: string }) {
               <button
                 type="button"
                 onClick={() => toggle(index)}
-                className="group flex w-full items-start gap-2 text-left"
+                className="group flex w-full cursor-pointer items-start gap-2 text-left"
                 aria-pressed={isChecked}
               >
                 <span
@@ -271,7 +271,7 @@ function SectionRailLink({
       type="button"
       onClick={() => onClick(id)}
       className={cn(
-        "border-b-2 pb-2",
+        "cursor-pointer border-b-2 pb-2",
         active ? "text-primary border-primary" : "text-faint hover:text-muted-foreground border-transparent",
       )}
     >
