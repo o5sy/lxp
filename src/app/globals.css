@@ -156,3 +156,13 @@
     @apply font-sans;
   }
 }
+
+/* Sandpack의 .sp-wrapper 내장 스타일(display:block)이 flex-1 유틸리티를 덮어써서
+   두 클래스 조합으로 특정도를 높여 이긴다. */
+.sandpack-session-wrapper.sp-wrapper {
+  display: flex;
+  flex: 1 1 0%;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+}

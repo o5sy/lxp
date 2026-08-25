@@ -35,7 +35,7 @@ export function SandpackSession() {
     <SandpackProvider
       template="react"
       files={INITIAL_FILES}
-      className="flex min-w-0 flex-1 flex-col overflow-hidden"
+      className="sandpack-session-wrapper flex min-w-0 flex-1 flex-col overflow-hidden"
     >
       <CodeSync />
       <div className="border-line relative min-h-0 flex-1 overflow-hidden border-b">
