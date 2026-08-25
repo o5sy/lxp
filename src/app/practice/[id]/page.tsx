@@ -1,9 +1,11 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 
 import { generatePractice } from "@/features/prompt-builder/lib/generate-practice";
+import { generatePracticeMock } from "@/features/prompt-builder/lib/generate-practice-mock";
 import { InstructionPanel } from "@/features/feedback-panel/components/instruction-panel";
 import { useResizablePanel } from "@/shared/hooks/use-resizable-panel";
 import { ResizeHandle } from "@/shared/ui/resize-handle";
@@ -20,9 +22,14 @@ export default function PracticeSessionPage() {
   const stage = usePromptBuilderStore((state) => state.stage);
   const situationTags = usePromptBuilderStore((state) => state.situationTags);
   const freeText = usePromptBuilderStore((state) => state.freeText);
+  const useMock = useSearchParams().get("mock") === "1";
 
   useEffect(() => {
     if (usePromptBuilderStore.getState().generationStatus !== "idle") return;
+    if (useMock) {
+      generatePracticeMock();
+      return;
+    }
     if (!concept.trim() || !stage) return;
     generatePractice({ concept, stage, situationTags, freeText });
     // eslint-disable-next-line react-hooks/exhaustive-deps

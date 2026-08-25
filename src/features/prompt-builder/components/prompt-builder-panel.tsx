@@ -85,6 +85,16 @@ export function PromptBuilderPanel() {
           </button>
         )}
       </div>
+
+      {process.env.NODE_ENV === "development" && (
+        <button
+          type="button"
+          onClick={() => router.push("/practice/mock-preview?mock=1")}
+          className="text-faint self-end font-mono text-[11px] underline underline-offset-2"
+        >
+          목데이터로 미리보기 (API 호출 없음)
+        </button>
+      )}
     </div>
   );
 }
