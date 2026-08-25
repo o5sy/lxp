@@ -19,9 +19,9 @@ export function MarkdownContent({ content, className }: MarkdownContentProps) {
           h1: MarkdownHeading,
           h2: MarkdownHeading,
           h3: MarkdownHeading,
-          p: ({ children }) => <p className="mb-3 last:mb-0">{children}</p>,
-          ul: ({ children }) => <ul className="mb-3 ml-4 list-disc space-y-1 last:mb-0">{children}</ul>,
-          ol: ({ children }) => <ol className="mb-3 ml-4 list-decimal space-y-1 last:mb-0">{children}</ol>,
+          p: ({ children }) => <p className="mb-4 last:mb-0">{children}</p>,
+          ul: ({ children }) => <ul className="mb-4 ml-4 list-disc space-y-2 last:mb-0">{children}</ul>,
+          ol: ({ children }) => <ol className="mb-4 ml-4 list-decimal space-y-2 last:mb-0">{children}</ol>,
           li: ({ children }) => <li className="pl-1">{children}</li>,
           strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
           a: ({ children, href }) => (
@@ -44,7 +44,11 @@ export function MarkdownContent({ content, className }: MarkdownContentProps) {
 }
 
 function MarkdownHeading({ children }: { children?: ReactNode }) {
-  return <p className="text-foreground mt-4 mb-1.5 font-mono text-xs tracking-wide uppercase first:mt-0">{children}</p>;
+  return (
+    <p className="border-line text-foreground mt-8 mb-3 border-t pt-4 font-mono text-xs tracking-wide uppercase first:mt-0 first:border-t-0 first:pt-0">
+      {children}
+    </p>
+  );
 }
 
 function MarkdownCode({ className, children }: { className?: string; children?: ReactNode }) {
