@@ -49,6 +49,7 @@ export function SandpackSession() {
       template="react"
       files={INITIAL_FILES}
       theme={theme}
+      options={{ recompileMode: "delayed", recompileDelay: 1200 }}
       className="sandpack-session-wrapper flex min-w-0 flex-1 flex-col overflow-hidden"
     >
       <CodeSync />
