@@ -12,6 +12,8 @@ export function InstructionPanel() {
   const generationStatus = usePromptBuilderStore((state) => state.generationStatus);
   const instruction = usePromptBuilderStore((state) => state.instruction);
   const generationError = usePromptBuilderStore((state) => state.generationError);
+  const feedbackRounds = usePromptBuilderStore((state) => state.feedbackRounds);
+  const criteriaChecks = feedbackRounds.at(-1)?.criteriaChecks ?? null;
 
   const stageOption = PCML_STAGES.find((option) => option.value === stage);
   const summary = [concept, stageOption && `${stageOption.stageName} 단계`, ...situationTags]
@@ -29,7 +31,14 @@ export function InstructionPanel() {
   );
 
   if (generationStatus !== "error" && instruction) {
-    return <InstructionMarkdown content={instruction} header={header} isStreaming={generationStatus === "streaming"} />;
+    return (
+      <InstructionMarkdown
+        content={instruction}
+        header={header}
+        isStreaming={generationStatus === "streaming"}
+        criteriaChecks={criteriaChecks}
+      />
+    );
   }
 
   return (
