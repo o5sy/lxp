@@ -29,7 +29,7 @@ export function InstructionPanel() {
   );
 
   if (generationStatus !== "error" && instruction) {
-    return <InstructionMarkdown content={instruction} header={header} />;
+    return <InstructionMarkdown content={instruction} header={header} isStreaming={generationStatus === "streaming"} />;
   }
 
   return (

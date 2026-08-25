@@ -13,6 +13,7 @@ import { cn } from "@/shared/lib/utils";
 type InstructionMarkdownProps = {
   content: string;
   header?: ReactNode;
+  isStreaming?: boolean;
 };
 
 type Section = {
@@ -53,7 +54,7 @@ function PlainListItem({ children }: { children?: ReactNode }) {
   return <li className="pl-1">{children}</li>;
 }
 
-export function InstructionMarkdown({ content, header }: InstructionMarkdownProps) {
+export function InstructionMarkdown({ content, header, isStreaming }: InstructionMarkdownProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [activeId, setActiveId] = useState(OVERVIEW_ID);
 
@@ -64,6 +65,10 @@ export function InstructionMarkdown({ content, header }: InstructionMarkdownProp
   useEffect(() => {
     const container = scrollRef.current;
     if (!container) return;
+    // 스트리밍 중에는 헤딩이 계속 새로 생기고 문서 높이가 계속 바뀌어서
+    // 활성 섹션 판정이 매 델타마다 흔들린다 — 레일 표시가 눈에 띄게
+    // 튀는 걸 막기 위해 스트리밍이 끝날 때까지는 갱신을 건너뛴다.
+    if (isStreaming) return;
 
     const targets = [OVERVIEW_ID, ...Object.values(HEADED_SECTION_IDS)]
       .map((id) => container.querySelector<HTMLElement>(`#${id}`))
@@ -97,7 +102,7 @@ export function InstructionMarkdown({ content, header }: InstructionMarkdownProp
     updateActiveSection();
     container.addEventListener("scroll", updateActiveSection, { passive: true });
     return () => container.removeEventListener("scroll", updateActiveSection);
-  }, [content]);
+  }, [content, isStreaming]);
 
   const scrollToSection = (id: string) => {
     scrollRef.current?.querySelector(`#${id}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -105,7 +110,7 @@ export function InstructionMarkdown({ content, header }: InstructionMarkdownProp
 
   return (
     <div className="flex h-full flex-col">
-      <div className="bg-background shrink-0 px-6 pt-6 pb-3">
+      <div className="bg-background shrink-0 px-6 pt-6">
         {header}
         <nav className="mt-6 flex gap-4 font-mono text-[11px] tracking-wide uppercase">
           <SectionRailLink id={OVERVIEW_ID} label="개요" activeId={activeId} onClick={scrollToSection} />
@@ -174,7 +179,7 @@ function ChecklistSection({ markdown }: { markdown: string }) {
           const label = stripNativeCheckbox(children);
 
           return (
-            <li>
+            <li className="list-none">
               <button
                 type="button"
                 onClick={() => toggle(index)}
