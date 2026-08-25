@@ -50,8 +50,22 @@ function SectionHeading({ children }: { children?: ReactNode }) {
   return <p className="mb-3 font-mono text-xs tracking-wide uppercase">{children}</p>;
 }
 
+function PlainList({ children }: { children?: ReactNode }) {
+  return <ul className="mb-4 space-y-2 last:mb-0">{children}</ul>;
+}
+
+/**
+ * 완료 기준 체크박스와 같은 좌측 정렬선(마커 폭 + gap-2)을 쓰는 커스텀 불릿.
+ * 브라우저 기본 list-disc 마커에 기대면 체크박스와 정확히 같은 줄에 맞추기
+ * 어려워서, 두 리스트 모두 같은 flex 레이아웃으로 마커를 직접 그린다.
+ */
 function PlainListItem({ children }: { children?: ReactNode }) {
-  return <li className="pl-1">{children}</li>;
+  return (
+    <li className="flex list-none items-start gap-2">
+      <span className="bg-faint mt-2 h-1 w-1 shrink-0 rounded-full" aria-hidden="true" />
+      <span>{children}</span>
+    </li>
+  );
 }
 
 export function InstructionMarkdown({ content, header, isStreaming }: InstructionMarkdownProps) {
@@ -142,7 +156,7 @@ export function InstructionMarkdown({ content, header, isStreaming }: Instructio
                 ) : (
                   <ReactMarkdown
                     remarkPlugins={[remarkGfm]}
-                    components={{ ...markdownProseComponents, h2: SectionHeading, li: PlainListItem }}
+                    components={{ ...markdownProseComponents, h2: SectionHeading, ul: PlainList, li: PlainListItem }}
                   >
                     {section.markdown}
                   </ReactMarkdown>
@@ -177,6 +191,7 @@ function ChecklistSection({ markdown }: { markdown: string }) {
       components={{
         ...markdownProseComponents,
         h2: SectionHeading,
+        ul: PlainList,
         li: ({ children }) => {
           const index = nextIndex++;
           const isChecked = checked[index] ?? false;
@@ -193,7 +208,7 @@ function ChecklistSection({ markdown }: { markdown: string }) {
                 <span
                   className={cn(
                     "mt-0.5 flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-[3px] border transition-colors",
-                    isChecked ? "bg-primary border-primary" : "border-line-strong group-hover:border-primary",
+                    isChecked ? "bg-primary border-primary" : "bg-background border-line-strong group-hover:border-primary",
                   )}
                   aria-hidden="true"
                 >
