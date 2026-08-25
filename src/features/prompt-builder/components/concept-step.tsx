@@ -168,6 +168,14 @@ export function ConceptStep() {
         setIsOpen(false);
         setActiveIndex(-1);
       }
+    } else if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+      // 커서만 옮기려던 건데, 선택된 인라인 제안 위에서 그냥 두면 브라우저가
+      // 선택만 풀고 제안 전체를 값으로 남겨버려서 자동완성된 것처럼 보인다.
+      // 화살표도 Esc/블러와 같은 "확정 안 함"으로 보고 거절한다.
+      if (hasGhostSelection) {
+        event.preventDefault();
+        rejectGhost(input);
+      }
     }
   };
 
