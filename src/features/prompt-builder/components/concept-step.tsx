@@ -201,6 +201,16 @@ export function ConceptStep() {
             onCompositionEnd={() => {
               isComposingRef.current = false;
             }}
+            onMouseDown={(event) => {
+              // 인라인 제안이 뜬 채로 마우스를 누르면(클릭/드래그 시작), 먼저
+              // 거절해서 실제로 타이핑한 부분만 남긴다 - 안 그러면 우리가 켠
+              // "선택 영역은 회색, 배경 없음" 스타일이 사용자가 직접 드래그한
+              // 선택에도 그대로 적용돼 하이라이트가 안 보이는 것처럼 느껴진다.
+              const input = event.currentTarget;
+              if (input.selectionStart !== input.selectionEnd) {
+                rejectGhost(input);
+              }
+            }}
             onFocus={() => setIsOpen(true)}
             onBlur={(event) => {
               const input = event.currentTarget;
