@@ -43,7 +43,9 @@ export function StageStep() {
                   <span
                     className={cn(
                       "font-mono text-xs",
-                      selected ? "text-foreground" : "text-muted-foreground/80 dark:text-muted-foreground",
+                      selected
+                        ? "text-foreground/70 dark:text-foreground"
+                        : "text-muted-foreground/80 dark:text-muted-foreground",
                     )}
                   >
                     {index + 1}단계: {option.stageName}
