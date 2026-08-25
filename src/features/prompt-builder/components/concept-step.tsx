@@ -58,9 +58,13 @@ export function ConceptStep() {
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const input = event.currentTarget;
     const rawValue = input.value;
-    const rawQuery = rawValue.trim().toLowerCase();
+    // 여기서는 trim하지 않는다 - 방금 입력한 공백이 후보 단어 자체의 띄어쓰기
+    // 위치와 일치하지 않으면(예: "이" 뒤에 공백) startsWith가 자연히 실패해
+    // 제안이 사라진다. trim해서 비교하면 그 공백을 무시한 채 같은 후보를
+    // 다시 붙여버려서, 사용자가 입력한 공백이 통째로 삼켜지는 문제가 있었다.
+    const rawQuery = rawValue.toLowerCase();
     const match =
-      !isComposingRef.current && !suppressGhostRef.current && rawQuery
+      !isComposingRef.current && !suppressGhostRef.current && rawQuery.trim()
         ? findPrefixMatch(rawQuery)
         : undefined;
 
