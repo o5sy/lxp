@@ -31,7 +31,7 @@ export function ConceptStep() {
         입력해서 제출할 수 있어요.
       </p>
       <div className="relative">
-        <div className="focus-within:border-primary border-line bg-sunken flex items-center gap-2.5 rounded-md border px-4.5 py-4">
+        <div className="focus-within:border-primary border-line dark:border-faint bg-sunken flex items-center gap-2.5 rounded-md border px-4.5 py-4">
           <span className="text-primary font-mono text-xl font-semibold">&gt;</span>
           <input
             type="text"
@@ -40,7 +40,7 @@ export function ConceptStep() {
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
             placeholder="배운 기술/개념을 짧게 입력하세요 (예: useEffect, 이벤트 버블링)"
-            className="placeholder:text-faint w-full bg-transparent font-mono text-base outline-none"
+            className="placeholder:text-muted-foreground w-full bg-transparent font-mono text-base outline-none"
           />
         </div>
         {showSuggestions && (

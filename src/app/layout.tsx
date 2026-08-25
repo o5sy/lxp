@@ -2,6 +2,18 @@ import type { Metadata } from "next";
 import { Fraunces, Instrument_Sans, JetBrains_Mono, Nanum_Gothic_Coding } from "next/font/google";
 import "./globals.css";
 
+import { ThemeProvider } from "@/shared/hooks/use-theme";
+
+const THEME_INIT_SCRIPT = `(function () {
+  try {
+    var stored = localStorage.getItem("theme");
+    var theme = stored === "dark" || stored === "light"
+      ? stored
+      : (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    if (theme === "dark") document.documentElement.classList.add("dark");
+  } catch (e) {}
+})();`;
+
 const fraunces = Fraunces({
   variable: "--font-voice",
   subsets: ["latin"],
@@ -39,7 +51,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="ko"
       className={`${fraunces.variable} ${instrumentSans.variable} ${jetbrainsMono.variable} ${nanumGothicCoding.variable} h-full antialiased`}
     >
-      <body className="font-body flex min-h-full flex-col">{children}</body>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
+      <body className="font-body flex min-h-full flex-col">
+        <ThemeProvider>{children}</ThemeProvider>
+      </body>
     </html>
   );
 }

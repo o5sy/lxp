@@ -7,6 +7,7 @@ import { generatePractice } from "@/features/prompt-builder/lib/generate-practic
 import { InstructionPanel } from "@/features/feedback-panel/components/instruction-panel";
 import { useResizablePanel } from "@/shared/hooks/use-resizable-panel";
 import { ResizeHandle } from "@/shared/ui/resize-handle";
+import { ThemeToggle } from "@/shared/ui/theme-toggle";
 import { usePromptBuilderStore } from "@/store/prompt-builder-store";
 
 const SandpackSession = dynamic(
@@ -31,8 +32,9 @@ export default function PracticeSessionPage() {
 
   return (
     <div className="bg-background flex h-screen flex-col">
-      <header className="bg-titlebar border-line flex h-11 shrink-0 items-center border-b px-4">
+      <header className="bg-titlebar border-line flex h-11 shrink-0 items-center justify-between border-b px-4">
         <p className="text-muted-foreground font-mono text-xs">{concept || "실습"} 실습</p>
+        <ThemeToggle />
       </header>
 
       <div className="flex flex-1 overflow-hidden">

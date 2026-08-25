@@ -11,6 +11,7 @@ import { useEffect, useRef } from "react";
 
 import { FeedbackPanel } from "@/features/feedback-panel/components/feedback-panel";
 import { useResizablePanel } from "@/shared/hooks/use-resizable-panel";
+import { useTheme } from "@/shared/hooks/use-theme";
 import { ResizeHandle } from "@/shared/ui/resize-handle";
 import { usePromptBuilderStore } from "@/store/prompt-builder-store";
 
@@ -38,6 +39,7 @@ function CodeSync() {
 export function SandpackSession() {
   const generationStatus = usePromptBuilderStore((state) => state.generationStatus);
   const starterCode = usePromptBuilderStore((state) => state.starterCode);
+  const { theme } = useTheme();
 
   const editorPane = useResizablePanel({ axis: "horizontal", initialSize: 480, min: 280, max: 900 });
   const feedbackPane = useResizablePanel({ axis: "vertical", initialSize: 220, min: 140, max: 480, reverse: true });
@@ -46,6 +48,7 @@ export function SandpackSession() {
     <SandpackProvider
       template="react"
       files={INITIAL_FILES}
+      theme={theme}
       className="sandpack-session-wrapper flex min-w-0 flex-1 flex-col overflow-hidden"
     >
       <CodeSync />
