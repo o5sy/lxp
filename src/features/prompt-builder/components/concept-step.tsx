@@ -58,22 +58,28 @@ export function ConceptStep() {
 
   const showSuggestions = isOpen && suggestions.length > 0;
 
-  const selectSuggestion = (item: string) => {
-    setConcept(item);
-    setActiveIndex(-1);
+  const clearGhostState = () => {
     setIsGhostShown(false);
     setTypedLength(null);
   };
 
+  const selectSuggestion = (item: string) => {
+    setConcept(item);
+    setActiveIndex(-1);
+    clearGhostState();
+  };
+
   // 아직 확정하지 않은(선택된) 인라인 제안을 거절하고, 실제로 타이핑한
-  // 부분까지만 남긴다. Esc뿐 아니라 포커스 아웃(다른 곳 클릭 등)도 같은
-  // "확정 안 함" 의사로 취급한다 - 그냥 두면 제안이 그대로 값으로 굳어버린다.
-  const rejectGhost = (input: HTMLInputElement) => {
-    const typedUpTo = input.selectionStart ?? input.value.length;
+  // 부분까지만 남긴다. Esc/블러/마우스다운/화살표뿐 아니라 onSelect로 잡아낸
+  // "다른 방식의 선택 변경"도 같은 "확정 안 함" 의사로 취급한다 - 그냥 두면
+  // 제안이 그대로 값으로 굳어버린다. typedLength(실제로 타이핑한 글자 수)를
+  // 기준으로 자르기 때문에, 호출 시점의 현재 선택 범위가 무엇이든(Ctrl+A로
+  // 전체가 선택돼 있어도) 항상 정확히 타이핑한 부분만 남는다.
+  const rejectGhost = () => {
+    if (typedLength === null) return;
     suppressGhostRef.current = true;
-    setConcept(input.value.slice(0, typedUpTo));
-    setIsGhostShown(false);
-    setTypedLength(null);
+    setConcept(concept.slice(0, typedLength));
+    clearGhostState();
   };
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -104,8 +110,7 @@ export function ConceptStep() {
       setIsGhostShown(true);
     } else {
       setConcept(rawValue);
-      setTypedLength(null);
-      setIsGhostShown(false);
+      clearGhostState();
     }
     setIsOpen(true);
     setActiveIndex(-1);
@@ -113,7 +118,6 @@ export function ConceptStep() {
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     const input = event.currentTarget;
-    const hasGhostSelection = input.selectionStart !== input.selectionEnd;
 
     if (event.key === "Backspace" || event.key === "Delete") {
       suppressGhostRef.current = true;
@@ -125,12 +129,26 @@ export function ConceptStep() {
       // 선택된(=아직 확정 안 된) 인라인 제안이 있을 때만 Tab을 가로채 커서를 끝으로
       // 옮겨 확정한다. 제안이 없거나 이미 확정된 상태라면 Tab은 그대로 다음
       // 포커스 대상(다음 버튼 등)으로 넘어간다 - 포커스 트랩이 되지 않는다.
-      if (hasGhostSelection) {
+      if (isGhostShown) {
         event.preventDefault();
         const end = input.value.length;
         input.setSelectionRange(end, end);
-        setIsGhostShown(false);
-        setTypedLength(null);
+        clearGhostState();
+      }
+      return;
+    }
+
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "a") {
+      // Ctrl+A(전체 선택)도 마찬가지로 "확정 안 함"이다. 다만 전체 선택의
+      // 의도 자체는 살려서, 타이핑한 부분만 남기고 그 전체를 다시 선택해준다.
+      if (isGhostShown && typedLength !== null) {
+        event.preventDefault();
+        const typed = concept.slice(0, typedLength);
+        input.value = typed;
+        input.setSelectionRange(0, typed.length);
+        suppressGhostRef.current = true;
+        setConcept(typed);
+        clearGhostState();
       }
       return;
     }
@@ -159,9 +177,9 @@ export function ConceptStep() {
         selectSuggestion(suggestions[activeIndex]);
       }
     } else if (event.key === "Escape") {
-      if (hasGhostSelection) {
+      if (isGhostShown) {
         event.preventDefault();
-        rejectGhost(input);
+        rejectGhost();
         return;
       }
       if (showSuggestions) {
@@ -172,9 +190,9 @@ export function ConceptStep() {
       // 커서만 옮기려던 건데, 선택된 인라인 제안 위에서 그냥 두면 브라우저가
       // 선택만 풀고 제안 전체를 값으로 남겨버려서 자동완성된 것처럼 보인다.
       // 화살표도 Esc/블러와 같은 "확정 안 함"으로 보고 거절한다.
-      if (hasGhostSelection) {
+      if (isGhostShown) {
         event.preventDefault();
-        rejectGhost(input);
+        rejectGhost();
       }
     }
   };
@@ -209,21 +227,35 @@ export function ConceptStep() {
             onCompositionEnd={() => {
               isComposingRef.current = false;
             }}
-            onMouseDown={(event) => {
+            onMouseDown={() => {
               // 인라인 제안이 뜬 채로 마우스를 누르면(클릭/드래그 시작), 먼저
               // 거절해서 실제로 타이핑한 부분만 남긴다 - 안 그러면 우리가 켠
               // "선택 영역은 회색, 배경 없음" 스타일이 사용자가 직접 드래그한
               // 선택에도 그대로 적용돼 하이라이트가 안 보이는 것처럼 느껴진다.
+              if (isGhostShown) {
+                rejectGhost();
+              }
+            }}
+            onSelect={(event) => {
+              // Home/End 등 우리가 일일이 다 챙기지 못한 방법으로 선택이
+              // 바뀐 경우를 잡아내는 안전망. select 이벤트는 우리가 직접
+              // setSelectionRange를 호출했을 때도 (비동기로) 발생하기 때문에
+              // "우리가 방금 호출했는지"로는 구분할 수 없다 - 대신 지금
+              // 선택 범위가 "인라인 제안이라면 당연히 이래야 할 범위"
+              // (typedLength ~ concept 끝)와 실제로 일치하는지를 매번
+              // 다시 계산해서 비교한다.
+              if (!isGhostShown || typedLength === null) return;
               const input = event.currentTarget;
-              if (input.selectionStart !== input.selectionEnd) {
-                rejectGhost(input);
+              const isExpectedGhostRange =
+                input.selectionStart === typedLength && input.selectionEnd === concept.length;
+              if (!isExpectedGhostRange) {
+                rejectGhost();
               }
             }}
             onFocus={() => setIsOpen(true)}
-            onBlur={(event) => {
-              const input = event.currentTarget;
-              if (input.selectionStart !== input.selectionEnd) {
-                rejectGhost(input);
+            onBlur={() => {
+              if (isGhostShown) {
+                rejectGhost();
               }
               setIsOpen(false);
             }}
