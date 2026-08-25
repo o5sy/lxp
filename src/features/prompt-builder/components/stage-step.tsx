@@ -27,7 +27,7 @@ export function StageStep() {
                 onClick={() => setStage(option.value)}
                 className={cn(
                   "flex w-full items-center gap-3 px-4 py-3.5 text-left",
-                  selected && "bg-selection",
+                  selected && "bg-selection/60",
                 )}
               >
                 <span
