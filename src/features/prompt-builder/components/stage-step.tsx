@@ -38,20 +38,27 @@ export function StageStep() {
                 render={<button type="button" />}
                 className={cn(
                   "flex w-full items-center gap-3 px-4 py-3.5 text-left",
-                  selected && "bg-selection",
+                  selected && "bg-selection/60",
                 )}
               >
                 <span
                   className={cn(
                     "font-mono text-sm font-semibold",
-                    selected ? "text-primary" : "text-faint",
+                    selected ? "text-primary" : "text-muted-foreground/80 dark:text-muted-foreground",
                   )}
                 >
                   {selected ? ">" : index + 1}
                 </span>
                 <span className="flex flex-col gap-0.5">
                   <span className="font-option text-foreground text-sm">{option.label}</span>
-                  <span className="text-faint font-mono text-xs">
+                  <span
+                    className={cn(
+                      "font-mono text-xs",
+                      selected
+                        ? "text-foreground/70 dark:text-foreground"
+                        : "text-muted-foreground/80 dark:text-muted-foreground",
+                    )}
+                  >
                     {index + 1}단계: {option.stageName}
                   </span>
                 </span>

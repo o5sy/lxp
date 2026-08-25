@@ -208,7 +208,7 @@ export function ConceptStep() {
         입력해서 제출할 수 있어요.
       </p>
       <div className="relative">
-        <div className="focus-within:border-primary border-line bg-sunken flex items-center gap-2.5 rounded-md border px-4.5 py-4">
+        <div className="focus-within:border-primary border-line dark:border-faint bg-sunken flex items-center gap-2.5 rounded-md border px-4.5 py-4">
           <span className="text-primary font-mono text-xl font-semibold">&gt;</span>
           <input
             type="text"
