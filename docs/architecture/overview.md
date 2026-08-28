@@ -2,7 +2,7 @@
 
 **작성일:** 2026-08-28 · **작성자:** 오승연
 
-arc42 템플릿 중 이 프로젝트의 결정을 가장 잘 드러내는 섹션(1.2 / 3 / 4 / 5 / 8)만 발췌했다. 프론트엔드 컴포넌트별 상세 책임·경계는 [components.md](components.md), 기술 선택별 상세 근거(Context/Decision/Consequences)는 [ADR](../adr/README.md), 요구사항 배경은 [PRD](../designs/ai-adaptive-practice-generator.md)를 참고.
+프론트엔드 컴포넌트별 상세 책임·경계는 [components.md](components.md), 기술 선택별 상세 근거(Context/Decision/Consequences)는 [ADR](../adr/README.md), 요구사항 배경은 [PRD](../designs/ai-adaptive-practice-generator.md)를 참고.
 
 ## 1. 소개 및 목표
 
