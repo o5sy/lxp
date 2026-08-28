@@ -26,7 +26,7 @@ arc42 템플릿 중 이 프로젝트의 결정을 가장 잘 드러내는 섹션
 
 - **비즈니스 컨텍스트:** 학습자(브라우저) → **프론트엔드 클라이언트** → **백엔드 API 서버**(Next.js Route Handler) → **Gemini API**(Google, 외부 시스템).
 
-![C4 Container 다이어그램 — 학습자, 프론트엔드 클라이언트, 백엔드 API 서버, Gemini API](diagrams/c4-container.png)
+![C4 Container 다이어그램](diagrams/c4-container.png)
 *(원본 편집 파일: [c4-container.drawio](diagrams/c4-container.drawio) — draw.io에서 열기. [components.md](components.md)와 동일한 다이어그램을 재사용 — 3개 박스뿐인 단순한 구조라 System Context 레벨을 따로 그리지 않고 Container 레벨 하나로 컨텍스트와 컨테이너 분해를 함께 보여준다.)*
 
 - **기술 컨텍스트:**
@@ -54,10 +54,11 @@ arc42 템플릿 중 이 프로젝트의 결정을 가장 잘 드러내는 섹션
 
 ### 5.2 Level 2 — 프론트엔드
 
-책임·경계 상세는 [components.md](components.md) 참고: Prompt Builder 화면 · 전역 상태 스토어(Zustand) · Practice Session 화면 · Sandpack 런타임.
+Prompt Builder 화면 / Practice Session 화면 / Sandpack 런타임 / 전역 상태 스토어(Zustand).
+책임·경계 상세는 [components.md](components.md) 참고
 
-![C4 Component 다이어그램 — 프론트엔드 클라이언트 내부](diagrams/c4-component-frontend.png)
-*(원본 편집 파일: [c4-component-frontend.drawio](diagrams/c4-component-frontend.drawio) — draw.io에서 열기. 컴포넌트별 상세는 [components.md](components.md) 참고.)*
+![C4 Component 다이어그램](diagrams/c4-component-frontend.png)
+*(원본 편집 파일: [c4-component-frontend.drawio](diagrams/c4-component-frontend.drawio) — draw.io에서 열기)*
 
 ### 5.3 Level 2 — 백엔드
 
