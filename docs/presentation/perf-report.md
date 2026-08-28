@@ -1,4 +1,4 @@
-# 성능 지표 리포트 (AI 맞춤 실습 생성기)
+# 성능 지표 리포트 (AI 개발 멘토)
 
 측정일: 2026-08-26
 측정 방법론: [ai-adaptive-practice-generator.md § Performance Comparison Methodology](designs/ai-adaptive-practice-generator.md#performance-comparison-methodology) 기준 — 단일 프로덕션 빌드에서 순차 계측 (A/B 빌드 없음)
