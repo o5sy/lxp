@@ -1,0 +1,138 @@
+<mxfile host="app.diagrams.net" agent="C4 Diagram Skill" pages="3">
+  <diagram id="c4-component-frontend" name="C4 Component Diagram - 프론트엔드 클라이언트">
+    <mxGraphModel dx="1437" dy="918" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1380" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="person_1" parent="1" style="shape=actor;whiteSpace=wrap;html=1;fillColor=#08427B;strokeColor=#052E56;" value="" vertex="1">
+          <mxGeometry height="60" width="40" x="240" y="76" as="geometry" />
+        </mxCell>
+        <mxCell id="person_1_label" parent="1" style="text;html=1;fontSize=12;align=left;verticalAlign=bottom;" value="&lt;b&gt;학습자&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;color:#666666&quot;&gt;[Person]&lt;/font&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;color:#666666&quot;&gt;두 화면을 오가며 입력하고, 코드를 작성해 피드백을 확인한다.&lt;/font&gt;" vertex="1">
+          <mxGeometry height="70" width="220" x="295" y="66" as="geometry" />
+        </mxCell>
+        <mxCell id="boundary_1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#444444;strokeWidth=2;dashed=1;fontSize=16;fontStyle=1;verticalAlign=top;align=left;spacingLeft=10;spacingTop=10;fontColor=#444444;" value="프론트엔드 클라이언트 [Container: Next.js/React, 브라우저]" vertex="1">
+          <mxGeometry height="380" width="1020" x="100" y="260" as="geometry" />
+        </mxCell>
+        <mxCell id="comp_1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;container=0;fillColor=#438DD5;fontColor=#ffffff;strokeColor=none;fontSize=14;align=center;" value="&lt;b&gt;Prompt Builder 화면&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:11px&quot;&gt;[Component: React 기능 모듈]&lt;/font&gt;&lt;br/&gt;&lt;br/&gt;&lt;font style=&quot;font-size:11px&quot;&gt;개념·목표·설명을 3단계로 수집해 스토어에 기록.&lt;/font&gt;" vertex="1">
+          <mxGeometry height="110" width="220" x="150" y="300" as="geometry" />
+        </mxCell>
+        <mxCell id="comp_3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;container=0;fillColor=#438DD5;fontColor=#ffffff;strokeColor=none;fontSize=14;align=center;" value="&lt;b&gt;Practice Session 화면&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:11px&quot;&gt;[Component: React 기능 모듈]&lt;/font&gt;&lt;br/&gt;&lt;br/&gt;&lt;font style=&quot;font-size:11px&quot;&gt;생성/피드백 요청을 트리거하고 SSE 스트림을 소비.&lt;/font&gt;" vertex="1">
+          <mxGeometry height="110" width="220" x="508" y="300" as="geometry" />
+        </mxCell>
+        <mxCell id="comp_4" parent="1" style="rounded=1;whiteSpace=wrap;html=1;container=0;fillColor=#438DD5;fontColor=#ffffff;strokeColor=none;fontSize=14;align=center;" value="&lt;b&gt;Sandpack 런타임&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:11px&quot;&gt;[Component: 서드파티 코드 실행 엔진]&lt;/font&gt;&lt;br/&gt;&lt;br/&gt;&lt;font style=&quot;font-size:11px&quot;&gt;코드 편집·실행. 코드 상태를 자체 컨텍스트로 소유.&lt;/font&gt;" vertex="1">
+          <mxGeometry height="110" width="220" x="855" y="300" as="geometry" />
+        </mxCell>
+        <mxCell id="comp_2" parent="1" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#438DD5;fontColor=#ffffff;strokeColor=none;fontSize=14;align=center;" value="&lt;b&gt;전역 상태 스토어&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:11px&quot;&gt;[Component: Zustand store]&lt;/font&gt;&lt;br/&gt;&lt;br/&gt;&lt;font style=&quot;font-size:11px&quot;&gt;빌더 입력값 · 생성 상태 · 피드백 상태를 단일 소스로 소유. 셀렉터 단위 구독.&lt;/font&gt;" vertex="1">
+          <mxGeometry height="110" width="220" x="290" y="480" as="geometry" />
+        </mxCell>
+        <mxCell id="backend_1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;container=0;fillColor=#999999;fontColor=#ffffff;strokeColor=none;fontSize=14;align=center;" value="&lt;b&gt;백엔드 API 서버&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:11px&quot;&gt;[Container: Next.js API Routes]&lt;/font&gt;" vertex="1">
+          <mxGeometry height="110" width="220" x="566" y="700" as="geometry" />
+        </mxCell>
+        <mxCell id="conn_1" edge="1" parent="1" source="person_1" style="endArrow=blockThin;endFill=1;fontSize=10;fontColor=#404040;strokeColor=#404040;labelBackgroundColor=#ffffff;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="comp_1" value="개념 · 목표 · 설명 입력 [UI 조작]">
+          <mxGeometry relative="1" x="-0.0122" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="conn_2" edge="1" parent="1" source="person_1" style="endArrow=blockThin;endFill=1;fontSize=10;fontColor=#404040;strokeColor=#404040;labelBackgroundColor=#ffffff;exitX=0.7;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="comp_3" value="코드 작성 · 피드백 확인 [UI 조작]">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="conn_3" edge="1" parent="1" source="comp_1" style="endArrow=blockThin;endFill=1;fontSize=10;fontColor=#404040;strokeColor=#404040;dashed=1;dashPattern=5 5;labelBackgroundColor=#ffffff;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="comp_3" value="제출 시 라우트 이동 &#xa;[클라이언트 라우팅]">
+          <mxGeometry relative="1" y="-15" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="conn_4" edge="1" parent="1" source="comp_1" style="endArrow=blockThin;endFill=1;fontSize=10;fontColor=#404040;strokeColor=#404040;labelBackgroundColor=#ffffff;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0;entryDx=0;entryDy=35;edgeStyle=orthogonalEdgeStyle;entryPerimeter=0;" target="comp_2" value="개념, 목표, 설명 기록 [함수 호출]">
+          <mxGeometry relative="1" x="-0.5308" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="conn_5" edge="1" parent="1" source="comp_2" style="endArrow=blockThin;endFill=1;fontSize=10;fontColor=#404040;strokeColor=#404040;labelBackgroundColor=#ffffff;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.3;entryY=1;entryDx=0;entryDy=0;edgeStyle=orthogonalEdgeStyle;exitPerimeter=0;" target="comp_3" value="셀렉터 구독 [상태 구독]">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="conn_6" edge="1" parent="1" source="comp_3" style="endArrow=blockThin;endFill=1;fontSize=10;fontColor=#404040;strokeColor=#404040;labelBackgroundColor=#ffffff;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0;entryDx=0;entryDy=35;edgeStyle=orthogonalEdgeStyle;entryPerimeter=0;" target="comp_2" value="생성 · 피드백 상태 갱신 [함수 호출]">
+          <mxGeometry relative="1" x="0.2023" y="-8" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="conn_7" edge="1" parent="1" source="comp_3" style="endArrow=blockThin;endFill=1;fontSize=10;fontColor=#404040;strokeColor=#404040;labelBackgroundColor=#ffffff;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="comp_4" value="실습 코드 단방향 동기화 &#xa;[props]">
+          <mxGeometry relative="1" y="-15" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="conn_8" edge="1" parent="1" source="comp_3" style="endArrow=blockThin;endFill=1;fontSize=10;fontColor=#404040;strokeColor=#404040;labelBackgroundColor=#ffffff;exitX=0.75;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="backend_1" value="실습 · 피드백 요청 &#xa;[REST/JSON, SSE 스트리밍]">
+          <mxGeometry relative="1" x="0.3474" y="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="legend_bg" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#CCCCCC;fontSize=12;" value="" vertex="1">
+          <mxGeometry height="168" width="266" x="1049" y="655" as="geometry" />
+        </mxCell>
+        <mxCell id="legend_title" parent="1" style="text;html=1;fontSize=13;fontColor=#333333;align=left;verticalAlign=top;" value="&lt;b&gt;Legend&lt;/b&gt;" vertex="1">
+          <mxGeometry height="20" width="100" x="1059" y="660" as="geometry" />
+        </mxCell>
+        <mxCell id="legend_person_box" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#08427B;strokeColor=none;" value="" vertex="1">
+          <mxGeometry height="16" width="16" x="1059" y="685" as="geometry" />
+        </mxCell>
+        <mxCell id="legend_person_label" parent="1" style="text;html=1;fontSize=11;fontColor=#333333;align=left;verticalAlign=middle;" value="Person" vertex="1">
+          <mxGeometry height="20" width="270" x="1083" y="683" as="geometry" />
+        </mxCell>
+        <mxCell id="legend_comp_box" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#438DD5;strokeColor=none;" value="" vertex="1">
+          <mxGeometry height="16" width="16" x="1059" y="709" as="geometry" />
+        </mxCell>
+        <mxCell id="legend_comp_label" parent="1" style="text;html=1;fontSize=11;fontColor=#333333;align=left;verticalAlign=middle;" value="Component (화면 / 모듈)" vertex="1">
+          <mxGeometry height="20" width="270" x="1083" y="707" as="geometry" />
+        </mxCell>
+        <mxCell id="legend_store_box" parent="1" style="shape=cylinder3;whiteSpace=wrap;html=1;size=4;fillColor=#438DD5;strokeColor=none;" value="" vertex="1">
+          <mxGeometry height="16" width="16" x="1059" y="733" as="geometry" />
+        </mxCell>
+        <mxCell id="legend_store_label" parent="1" style="text;html=1;fontSize=11;fontColor=#333333;align=left;verticalAlign=middle;" value="Component (상태 저장)" vertex="1">
+          <mxGeometry height="20" width="270" x="1083" y="731" as="geometry" />
+        </mxCell>
+        <mxCell id="legend_supporting_box" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#999999;strokeColor=none;" value="" vertex="1">
+          <mxGeometry height="16" width="16" x="1059" y="757" as="geometry" />
+        </mxCell>
+        <mxCell id="legend_supporting_label" parent="1" style="text;html=1;fontSize=11;fontColor=#333333;align=left;verticalAlign=middle;" value="Supporting Container (범위 밖)" vertex="1">
+          <mxGeometry height="20" width="270" x="1083" y="755" as="geometry" />
+        </mxCell>
+        <mxCell id="legend_sync_line" edge="1" parent="1" style="endArrow=blockThin;endFill=1;strokeColor=#404040;" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1059" y="787" as="sourcePoint" />
+            <mxPoint x="1109" y="787" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="legend_sync_label" parent="1" style="text;html=1;fontSize=11;fontColor=#333333;align=left;verticalAlign=middle;" value="Synchronous" vertex="1">
+          <mxGeometry height="20" width="120" x="1119" y="779" as="geometry" />
+        </mxCell>
+        <mxCell id="legend_async_line" edge="1" parent="1" style="endArrow=blockThin;endFill=1;strokeColor=#404040;dashed=1;dashPattern=5 5;" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1059" y="811" as="sourcePoint" />
+            <mxPoint x="1109" y="811" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="legend_async_label" parent="1" style="text;html=1;fontSize=11;fontColor=#333333;align=left;verticalAlign=middle;" value="Asynchronous (라우팅 전환)" vertex="1">
+          <mxGeometry height="20" width="220" x="1119" y="803" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="pW6zUCbYkSmq9mcLZCnz" name="페이지-2">
+    <mxGraphModel dx="934" dy="597" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="jFohexwojwIRbxWSePlo" name="페이지-3">
+    <mxGraphModel dx="934" dy="597" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
