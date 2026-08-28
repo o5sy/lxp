@@ -1,6 +1,6 @@
 # ADR (Architecture Decision Records)
 
-AI 맞춤 실습 생성기 프로젝트의 기술스택/아키텍처 결정 기록. 각 ADR은 [Michael Nygard 포맷](https://cognitect.com/blog/2011/11/15/documenting-architecture-decisions)(Context / Decision / Consequences)을 따른다.
+AI 개발 멘토 프로젝트의 기술스택/아키텍처 결정 기록. 각 ADR은 [Michael Nygard 포맷](https://cognitect.com/blog/2011/11/15/documenting-architecture-decisions)(Context / Decision / Consequences)을 따른다.
 
 관련 문서: [PRD](../designs/ai-adaptive-practice-generator.md) · [원페이저](../designs/onepager-submission.md) · [DESIGN.md](../../DESIGN.md)
 

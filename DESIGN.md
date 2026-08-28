@@ -1,4 +1,4 @@
-# Design System — AI 맞춤 실습 생성기 (practice-generator)
+# Design System — AI 개발 멘토 (practice-generator)
 
 ## Product Context
 - **What this is:** 부트캠프 학습자가 방금 배운 개념을 골라 개인화된 코딩 실습을 받고, 같은 화면에서 실행(Sandpack)하고, AI 피드백을 받는 단일 화면 웹앱.
