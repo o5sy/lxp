@@ -1,0 +1,13 @@
+{
+  "input": {
+    "concept": "useState",
+    "difficulty": "typing",
+    "freeText": ""
+  },
+  "output": {
+    "instruction": "React의 `useState` 훅은 컴포넌트 내에서 변경 가능한 상태(State)를 생성하고 관리할 때 사용하는 가장 기본적인 API입니다.\n\n이 실습에서는 `useState`의 기본 문법을 직접 작성해 보며 상태 생성과 상태 변경 함수 호출 방식을 익힙니다.\n\n카운터의 숫자를 증가시키고 감소시키는 단순한 기능을 구현하며 `useState`의 동작 원리를 확인해 보세요.\n\n## 실습 목표\n- `useState` 훅의 기본 선언 문법(`const [state, setState] = useState(initialValue)`)을 직접 작성할 수 있다.\n- 상태 변경 함수를 호출하여 화면의 값을 업데이트할 수 있다.\n\n## 요구 사항\n- `React` 패키지에서 `useState` 훅을 import 하세요.\n- `App` 컴포넌트 내에 `count` 상태를 생성하고 초기값을 `0`으로 설정하세요.\n- `+1` 버튼 클릭 시 `count`가 1 증가하는 `handleIncrement` 함수를 완성하세요.\n- `-1` 버튼 클릭 시 `count`가 1 감소하는 `handleDecrement` 함수를 완성하세요.\n- JSX 내 `현재 카운트` 부분에 `count` 상태값이 화면에 보이도록 표시하세요.\n\n## 완료 기준\n- 화면에 현재 카운트 값 `0`이 올바르게 렌더링된다.\n- `+1` 버튼을 클릭할 때마다 화면의 숫자 값이 1씩 증가한다.\n- `-1` 버튼을 클릭할 때마다 화면의 숫자 값이 1씩 감소한다.",
+    "starterCode": "import React from 'react';\n// TODO: react 패키지에서 useState를 import 하세요.\n\nexport default function App() {\n  // TODO: useState를 사용하여 count 상태를 선언하세요 (초기값: 0)\n\n  const handleIncrement = () => {\n    // TODO: count를 1 증가시키는 상태 변경 함수를 호출하세요.\n  };\n\n  const handleDecrement = () => {\n    // TODO: count를 1 감소시키는 상태 변경 함수를 호출하세요.\n  };\n\n  return (\n    <div style={{ padding: '20px', textAlign: 'center' }}>\n      <h1>Simple Counter</h1>\n      {/* TODO: 아래의 '0'을 count 상태 변수로 대체하세요 */}\n      <p style={{ fontSize: '24px', fontWeight: 'bold' }}>현재 카운트: 0</p>\n      <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>\n        <button onClick={handleIncrement}>+1</button>\n        <button onClick={handleDecrement}>-1</button>\n      </div>\n    </div>\n  );\n}"
+  },
+  "model": "gemini-3.6-flash",
+  "capturedAt": "2026-09-11T11:05:53.615Z"
+}
