@@ -6,6 +6,8 @@ export type PracticeDifficulty = "typing" | "apply" | "stretch";
 
 export type AsyncStatus = "idle" | "loading" | "streaming" | "done" | "error" | "rejected";
 
+export type ConceptCheckStatus = "idle" | "checking" | "valid" | "invalid";
+
 export const TOTAL_BUILDER_STEPS = 3;
 
 export type FeedbackRound = {
@@ -25,6 +27,12 @@ type PromptBuilderState = {
   goBack: () => void;
   returnToConceptStep: () => void;
   reset: () => void;
+
+  conceptCheckStatus: ConceptCheckStatus;
+  conceptCheckReason: string | null;
+  startConceptCheck: () => void;
+  setConceptCheckValid: () => void;
+  setConceptCheckInvalid: (reason: string) => void;
 
   generationStatus: AsyncStatus;
   instruction: string;
@@ -53,13 +61,21 @@ export const usePromptBuilderStore = create<PromptBuilderState>((set) => ({
   concept: "",
   difficulty: null,
   freeText: "",
-  setConcept: (concept) => set({ concept }),
+  // 개념 텍스트가 바뀌면 이전 판별 결과는 더 이상 유효하지 않다.
+  setConcept: (concept) => set({ concept, conceptCheckStatus: "idle", conceptCheckReason: null }),
   setDifficulty: (difficulty) => set({ difficulty }),
   setFreeText: (freeText) => set({ freeText }),
   goNext: () => set((state) => ({ step: Math.min(state.step + 1, TOTAL_BUILDER_STEPS) })),
   goBack: () => set((state) => ({ step: Math.max(state.step - 1, 1) })),
-  returnToConceptStep: () => set({ step: 1 }),
-  reset: () => set({ step: 1, concept: "", difficulty: null, freeText: "" }),
+  returnToConceptStep: () => set({ step: 1, conceptCheckStatus: "idle", conceptCheckReason: null }),
+  reset: () =>
+    set({ step: 1, concept: "", difficulty: null, freeText: "", conceptCheckStatus: "idle", conceptCheckReason: null }),
+
+  conceptCheckStatus: "idle",
+  conceptCheckReason: null,
+  startConceptCheck: () => set({ conceptCheckStatus: "checking", conceptCheckReason: null }),
+  setConceptCheckValid: () => set({ conceptCheckStatus: "valid", conceptCheckReason: null }),
+  setConceptCheckInvalid: (reason) => set({ conceptCheckStatus: "invalid", conceptCheckReason: reason }),
 
   generationStatus: "idle",
   instruction: "",

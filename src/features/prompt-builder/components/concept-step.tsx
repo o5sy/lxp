@@ -22,6 +22,8 @@ function findPrefixMatch(query: string) {
 export function ConceptStep() {
   const concept = usePromptBuilderStore((state) => state.concept);
   const setConcept = usePromptBuilderStore((state) => state.setConcept);
+  const conceptCheckStatus = usePromptBuilderStore((state) => state.conceptCheckStatus);
+  const conceptCheckReason = usePromptBuilderStore((state) => state.conceptCheckReason);
   const [isOpen, setIsOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
   // 인라인 자동완성(ghost)이 현재 화면에 보이는지 - 선택 영역 스타일링에 쓴다.
@@ -310,9 +312,13 @@ export function ConceptStep() {
           </ul>
         )}
       </div>
-      {isRecognized && (
+      {conceptCheckStatus === "invalid" && conceptCheckReason ? (
+        <p className="text-amber-500 font-mono text-xs">{conceptCheckReason}</p>
+      ) : conceptCheckStatus === "checking" ? (
+        <p className="text-faint font-mono text-xs">확인하는 중...</p>
+      ) : isRecognized ? (
         <p className="text-faint font-mono text-xs">✓ 프론트엔드 개념으로 인식했어요</p>
-      )}
+      ) : null}
     </div>
   );
 }

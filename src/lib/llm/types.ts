@@ -27,10 +27,18 @@ export const practiceGenerationSchema = z.object({
 
 export type PracticeGeneration = z.infer<typeof practiceGenerationSchema>;
 
+// practiceGenerationSchema에서 판별 필드만 뽑아낸 스키마. 1단계 개념 사전 판별처럼
+// 실습 본문(instruction/starterCode)까지는 필요 없는 가벼운 호출에 쓴다.
+export const conceptValiditySchema = practiceGenerationSchema.pick({ status: true, reason: true });
+
+export type ConceptValidity = z.infer<typeof conceptValiditySchema>;
+
 export type PracticeGenerationInput = {
   concept: string;
   difficulty: PracticeDifficulty;
   freeText: string;
+  // true면 실습 본문은 생성하지 않고 개념 적합성만 가벼운 모델로 판별한다.
+  checkOnly?: boolean;
 };
 
 export type FeedbackInput = {

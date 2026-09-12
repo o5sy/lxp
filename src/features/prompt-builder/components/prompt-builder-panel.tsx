@@ -3,6 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { isLocallyRecognized } from "@/features/prompt-builder/data/concept-whitelist";
+import { checkConceptValidity } from "@/features/prompt-builder/lib/check-concept-validity";
 import { BUILDER_STEP_LABELS } from "@/features/prompt-builder/lib/options";
 import { StepRail } from "@/shared/ui/step-rail";
 import { TOTAL_BUILDER_STEPS, usePromptBuilderStore } from "@/store/prompt-builder-store";
@@ -27,10 +29,28 @@ export function PromptBuilderPanel() {
   const difficulty = usePromptBuilderStore((state) => state.difficulty);
   const goNext = usePromptBuilderStore((state) => state.goNext);
   const goBack = usePromptBuilderStore((state) => state.goBack);
+  const conceptCheckStatus = usePromptBuilderStore((state) => state.conceptCheckStatus);
+  const startConceptCheck = usePromptBuilderStore((state) => state.startConceptCheck);
+  const setConceptCheckValid = usePromptBuilderStore((state) => state.setConceptCheckValid);
+  const setConceptCheckInvalid = usePromptBuilderStore((state) => state.setConceptCheckInvalid);
 
   const canGoNext = (step === 1 && concept.trim().length > 0) || (step === 2 && difficulty !== null);
+  const isCheckingConcept = conceptCheckStatus === "checking";
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleNext = async () => {
+    if (step === 1 && conceptCheckStatus !== "valid" && !isLocallyRecognized(concept)) {
+      startConceptCheck();
+      const result = await checkConceptValidity(concept);
+      if (!result.valid) {
+        setConceptCheckInvalid(result.reason);
+        return;
+      }
+      setConceptCheckValid();
+    }
+    goNext();
+  };
 
   const handleSubmit = () => {
     setIsSubmitting(true);
@@ -65,11 +85,11 @@ export function PromptBuilderPanel() {
         {step < TOTAL_BUILDER_STEPS ? (
           <button
             type="button"
-            disabled={!canGoNext}
-            onClick={goNext}
+            disabled={!canGoNext || isCheckingConcept}
+            onClick={handleNext}
             className="bg-primary text-primary-foreground cursor-pointer rounded-md px-4 py-2 font-mono text-xs font-medium disabled:cursor-not-allowed disabled:opacity-50"
           >
-            다음 →
+            {isCheckingConcept ? "확인하는 중..." : "다음 →"}
           </button>
         ) : (
           <button
