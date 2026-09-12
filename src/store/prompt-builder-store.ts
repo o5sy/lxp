@@ -4,7 +4,7 @@ import type { FeedbackCriterionCheck } from "@/lib/llm/types";
 
 export type PracticeDifficulty = "typing" | "apply" | "stretch";
 
-export type AsyncStatus = "idle" | "loading" | "streaming" | "done" | "error";
+export type AsyncStatus = "idle" | "loading" | "streaming" | "done" | "error" | "rejected";
 
 export const TOTAL_BUILDER_STEPS = 3;
 
@@ -23,17 +23,20 @@ type PromptBuilderState = {
   setFreeText: (freeText: string) => void;
   goNext: () => void;
   goBack: () => void;
+  returnToConceptStep: () => void;
   reset: () => void;
 
   generationStatus: AsyncStatus;
   instruction: string;
   starterCode: string | null;
   generationError: string | null;
+  rejectionReason: string | null;
   startGeneration: () => void;
   appendInstruction: (delta: string) => void;
   setStarterCode: (code: string) => void;
   setGenerationDone: () => void;
   setGenerationError: (message: string) => void;
+  setConceptRejected: (reason: string) => void;
 
   feedbackStatus: AsyncStatus;
   feedbackRounds: FeedbackRound[];
@@ -55,19 +58,28 @@ export const usePromptBuilderStore = create<PromptBuilderState>((set) => ({
   setFreeText: (freeText) => set({ freeText }),
   goNext: () => set((state) => ({ step: Math.min(state.step + 1, TOTAL_BUILDER_STEPS) })),
   goBack: () => set((state) => ({ step: Math.max(state.step - 1, 1) })),
+  returnToConceptStep: () => set({ step: 1 }),
   reset: () => set({ step: 1, concept: "", difficulty: null, freeText: "" }),
 
   generationStatus: "idle",
   instruction: "",
   starterCode: null,
   generationError: null,
+  rejectionReason: null,
   startGeneration: () =>
-    set({ generationStatus: "loading", instruction: "", starterCode: null, generationError: null }),
+    set({
+      generationStatus: "loading",
+      instruction: "",
+      starterCode: null,
+      generationError: null,
+      rejectionReason: null,
+    }),
   appendInstruction: (delta) =>
     set((state) => ({ generationStatus: "streaming", instruction: state.instruction + delta })),
   setStarterCode: (code) => set({ starterCode: code }),
   setGenerationDone: () => set({ generationStatus: "done" }),
   setGenerationError: (message) => set({ generationStatus: "error", generationError: message }),
+  setConceptRejected: (reason) => set({ generationStatus: "rejected", rejectionReason: reason }),
 
   feedbackStatus: "idle",
   feedbackRounds: [],

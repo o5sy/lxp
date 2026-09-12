@@ -3,8 +3,14 @@ import { parseSSE } from "@/shared/lib/parse-sse";
 import { usePromptBuilderStore } from "@/store/prompt-builder-store";
 
 export async function generatePractice(input: PracticeGenerationInput) {
-  const { startGeneration, appendInstruction, setStarterCode, setGenerationDone, setGenerationError } =
-    usePromptBuilderStore.getState();
+  const {
+    startGeneration,
+    appendInstruction,
+    setStarterCode,
+    setGenerationDone,
+    setGenerationError,
+    setConceptRejected,
+  } = usePromptBuilderStore.getState();
 
   startGeneration();
 
@@ -24,6 +30,9 @@ export async function generatePractice(input: PracticeGenerationInput) {
         appendInstruction(data);
       } else if (event === "code") {
         setStarterCode(data);
+      } else if (event === "rejected") {
+        setConceptRejected(data);
+        return;
       } else if (event === "error") {
         throw new Error(data);
       } else if (event === "done") {

@@ -3,12 +3,26 @@ import { z } from "zod";
 import type { PracticeDifficulty } from "@/store/prompt-builder-store";
 
 export const practiceGenerationSchema = z.object({
-  instruction: z
+  status: z
+    .enum(["valid", "invalid"])
+    .describe(
+      "학습자가 입력한 개념이 프론트엔드 코딩 실습으로 옮길 수 있는 성격인지 판별한 결과. '하네스 엔지니어링'처럼 코드 실습으로 만들 수 없는 개념이면 invalid, 그 외에는 valid.",
+    ),
+  reason: z
     .string()
     .describe(
-      "마크다운 형식의 실습 지시문. 순서와 제목을 그대로 따른다: (1) 헤딩 없는 개요(핵심 개념과 목적을 2~3문장으로, 문장마다 빈 줄로 구분된 별도 문단으로), (2) '## 실습 목표', (3) '## 요구 사항', (4) '## 완료 기준'. 정답 코드나 완성된 구현은 포함하지 않는다.",
+      "status가 invalid일 때, 학습자가 이해할 수 있게 왜 이 개념을 코드 실습으로 만들기 어려운지 간결히 설명한다. status가 valid면 빈 문자열로 둔다.",
     ),
-  starterCode: z.string().describe("학습자가 채워나갈 시작 코드. App.jsx 전체 파일 내용."),
+  instruction: z
+    .string()
+    .optional()
+    .describe(
+      "status가 valid일 때만 채운다. 마크다운 형식의 실습 지시문. 순서와 제목을 그대로 따른다: (1) 헤딩 없는 개요(핵심 개념과 목적을 2~3문장으로, 문장마다 빈 줄로 구분된 별도 문단으로), (2) '## 실습 목표', (3) '## 요구 사항', (4) '## 완료 기준'. 정답 코드나 완성된 구현은 포함하지 않는다.",
+    ),
+  starterCode: z
+    .string()
+    .optional()
+    .describe("status가 valid일 때만 채운다. 학습자가 채워나갈 시작 코드. App.jsx 전체 파일 내용."),
 });
 
 export type PracticeGeneration = z.infer<typeof practiceGenerationSchema>;

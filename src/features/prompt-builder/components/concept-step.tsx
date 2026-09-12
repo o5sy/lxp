@@ -2,6 +2,7 @@
 
 import { useMemo, useRef, useState } from "react";
 
+import { isLocallyRecognized } from "@/features/prompt-builder/data/concept-whitelist";
 import { CONCEPT_SUGGESTIONS } from "@/features/prompt-builder/lib/options";
 import { cn } from "@/shared/lib/utils";
 import { usePromptBuilderStore } from "@/store/prompt-builder-store";
@@ -57,6 +58,9 @@ export function ConceptStep() {
   }, [query]);
 
   const showSuggestions = isOpen && suggestions.length > 0;
+  // 명백히 화이트리스트 범주 안인 개념만 가볍게 알려준다 - 매치 안 된다고
+  // 부적합은 아니므로 부정적/차단 피드백은 여기서 하지 않는다.
+  const isRecognized = useMemo(() => isLocallyRecognized(concept), [concept]);
 
   const clearGhostState = () => {
     setIsGhostShown(false);
@@ -306,6 +310,9 @@ export function ConceptStep() {
           </ul>
         )}
       </div>
+      {isRecognized && (
+        <p className="text-faint font-mono text-xs">✓ 프론트엔드 개념으로 인식했어요</p>
+      )}
     </div>
   );
 }
