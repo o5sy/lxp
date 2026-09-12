@@ -11,6 +11,21 @@ function sseEvent(event: string, data: string) {
   return `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
 }
 
+function toFriendlyErrorMessage(error: unknown): string {
+  const message = error instanceof Error ? error.message : "";
+
+  if (/fetch failed|network|ECONNRESET|ETIMEDOUT/i.test(message)) {
+    return "네트워크 연결이 불안정해요. 잠시 후 다시 시도해주세요.";
+  }
+  if (/rate limit|429|quota/i.test(message)) {
+    return "요청이 몰려 잠시 처리가 지연되고 있어요. 잠시 후 다시 시도해주세요.";
+  }
+  if (/JSON|parse|schema|validation/i.test(message)) {
+    return "실습 생성 결과를 처리하지 못했어요. 다시 시도해주세요.";
+  }
+  return "실습 생성에 실패했습니다. 잠시 후 다시 시도해주세요.";
+}
+
 export async function POST(request: Request) {
   const input = (await request.json()) as PracticeGenerationInput;
 
@@ -63,8 +78,7 @@ export async function POST(request: Request) {
           controller.enqueue(encoder.encode(sseEvent("done", "")));
         }
       } catch (error) {
-        const message = error instanceof Error ? error.message : "실습 생성에 실패했습니다.";
-        controller.enqueue(encoder.encode(sseEvent("error", message)));
+        controller.enqueue(encoder.encode(sseEvent("error", toFriendlyErrorMessage(error))));
       } finally {
         controller.close();
       }
