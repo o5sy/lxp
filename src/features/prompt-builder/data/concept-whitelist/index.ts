@@ -21,15 +21,10 @@ export function isLocallyRecognized(
   if (normalizedConcept.length < 2) return false;
 
   const keywords = CONCEPT_WHITELIST_BY_CATEGORY[category] ?? [];
-  return keywords.some((keyword) => {
-    const normalizedKeyword = normalize(keyword);
-    if (normalizedConcept.includes(normalizedKeyword)) return true;
-    // 키워드가 타이핑한 텍스트를 포함하는 방향("캡처링"이 "이벤트캡처링"의 부분
-    // 문자열인 경우)도 인정하되, "us"처럼 짧은 조각이 긴 키워드 여럿에 우연히
-    // 걸리지 않도록 타이핑한 길이가 키워드 길이의 절반은 돼야 인정한다.
-    return (
-      normalizedKeyword.includes(normalizedConcept) &&
-      normalizedConcept.length >= normalizedKeyword.length / 2
-    );
-  });
+  // 타이핑한 텍스트가 키워드 전체를 완전히 포함할 때만 인정한다. 반대 방향
+  // (키워드가 타이핑한 텍스트를 포함 - "useSt"가 "useState"의 부분 문자열인 경우)은
+  // 인정하지 않는다 - 이 인식 결과가 route.ts에서 LLM 판별 자체를 건너뛰는 데
+  // 쓰이므로, "useSt"처럼 불완전한 조각까지 통과시키면 검증되지 않은 입력이
+  // 그대로 생성 단계로 넘어간다.
+  return keywords.some((keyword) => normalizedConcept.includes(normalize(keyword)));
 }
