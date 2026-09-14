@@ -23,6 +23,13 @@ export function isLocallyRecognized(
   const keywords = CONCEPT_WHITELIST_BY_CATEGORY[category] ?? [];
   return keywords.some((keyword) => {
     const normalizedKeyword = normalize(keyword);
-    return normalizedConcept.includes(normalizedKeyword) || normalizedKeyword.includes(normalizedConcept);
+    if (normalizedConcept.includes(normalizedKeyword)) return true;
+    // 키워드가 타이핑한 텍스트를 포함하는 방향("캡처링"이 "이벤트캡처링"의 부분
+    // 문자열인 경우)도 인정하되, "us"처럼 짧은 조각이 긴 키워드 여럿에 우연히
+    // 걸리지 않도록 타이핑한 길이가 키워드 길이의 절반은 돼야 인정한다.
+    return (
+      normalizedKeyword.includes(normalizedConcept) &&
+      normalizedConcept.length >= normalizedKeyword.length / 2
+    );
   });
 }
