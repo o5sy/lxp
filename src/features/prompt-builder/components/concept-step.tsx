@@ -4,6 +4,7 @@ import { useMemo, useRef, useState } from "react";
 
 import { isLocallyRecognized } from "@/features/prompt-builder/data/concept-whitelist";
 import { CONCEPT_SUGGESTIONS } from "@/features/prompt-builder/lib/options";
+import { useDebouncedValue } from "@/shared/hooks/use-debounced-value";
 import { cn } from "@/shared/lib/utils";
 import { usePromptBuilderStore } from "@/store/prompt-builder-store";
 
@@ -60,9 +61,17 @@ export function ConceptStep() {
   }, [query]);
 
   const showSuggestions = isOpen && suggestions.length > 0;
+
   // 명백히 화이트리스트 범주 안인 개념만 가볍게 알려준다 - 매치 안 된다고
   // 부적합은 아니므로 부정적/차단 피드백은 여기서 하지 않는다.
-  const isRecognized = useMemo(() => isLocallyRecognized(concept), [concept]);
+  // - ghost 자동완성으로 아직 확정 안 된 부분은 제외하고, 실제로 타이핑한
+  //   부분(typedText)만 기준으로 판단한다.
+  // - 타이핑 중 매 글자마다 표시가 깜빡이지 않도록 디바운싱한다.
+  const debouncedTypedText = useDebouncedValue(typedText, 300);
+  const debouncedRecognized = useMemo(
+    () => isLocallyRecognized(debouncedTypedText),
+    [debouncedTypedText],
+  );
 
   const clearGhostState = () => {
     setIsGhostShown(false);
@@ -316,7 +325,7 @@ export function ConceptStep() {
         <p className="text-amber-500 font-mono text-xs">{conceptCheckReason}</p>
       ) : conceptCheckStatus === "checking" ? (
         <p className="text-faint font-mono text-xs">확인하는 중...</p>
-      ) : isRecognized ? (
+      ) : debouncedRecognized ? (
         <p className="text-faint font-mono text-xs">✓ 프론트엔드 개념으로 인식했어요</p>
       ) : null}
     </div>

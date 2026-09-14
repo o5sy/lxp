@@ -29,6 +29,13 @@
 - 간단한 기능은 외부 라이브러리 없이 직접 구현하는 것을 지향한다 (예: 드래그 리사이징, 다크모드 토글처럼 수십~백여 줄 안에서 구현 가능한 것들).
 - 정말 라이브러리가 필요하다고 판단되면(구현 난이도가 높거나, 보안/접근성처럼 직접 구현 시 위험이 큰 영역), 추가하기 전에 먼저 사용자에게 물어보고 승인을 받는다.
 
+## 재사용 로직 분리 규칙
+
+- "SOLID/SRP를 지켜라" 같은 추상적 원칙 언급만으로는 실제로 코드가 안 쪼개질 수 있다 — 아래처럼 구체적인 신호와 위치를 명시한다.
+- 디바운스/스로틀, 타이머, localStorage 접근, 리사이즈 감지처럼 **특정 화면 로직과 무관한 범용 상태/타이밍 로직**은 컴포넌트 안에 인라인으로 두지 않고 `src/shared/hooks/`에 훅으로 뽑는다 (예: `use-debounced-value.ts`, `use-resizable-panel.ts`).
+- 판단 기준: 그 로직이 "이 컴포넌트가 무엇을 보여주는지"와 무관하게 다른 컴포넌트에서도 그대로 쓸 수 있다면 훅으로 분리 대상이다. 컴포넌트 고유의 UX 흐름(예: 자동완성 ghost 텍스트 확정/취소 로직)은 그 컴포넌트에 남겨도 된다.
+- 새 훅은 기존 훅 파일(`use-resizable-panel.ts` 등)의 스타일(옵션 객체 인자, JSDoc 없는 간단한 주석)을 따른다.
+
 ## 사용 가능한 스킬 (slash command)
 
 `_gstack-command`, `autoplan`, `benchmark`, `benchmark-models`, `browse`, `canary`, `careful`, `codex`, `connect-chrome`, `context-restore`, `context-save`, `cso`, `design-consultation`, `design-html`, `design-review`, `design-shotgun`, `devex-review`, `diagram`, `document-generate`, `document-release`, `freeze`, `gstack-upgrade`, `guard`, `health`, `investigate`, `ios-clean`, `ios-design-review`, `ios-fix`, `ios-qa`, `ios-sync`, `land-and-deploy`, `landing-report`, `learn`, `make-pdf`, `office-hours`, `open-gstack-browser`, `pair-agent`, `plan-ceo-review`, `plan-design-review`, `plan-devex-review`, `plan-eng-review`, `plan-tune`, `qa`, `qa-only`, `retro`, `review`, `scrape`, `setup-browser-cookies`, `setup-deploy`, `setup-gbrain`, `ship`, `skillify`, `spec`, `sync-gbrain`, `unfreeze`
