@@ -2,6 +2,32 @@ import type { FeedbackCriterionCheck, FeedbackInput } from "@/lib/llm/types";
 import { parseSSE } from "@/shared/lib/parse-sse";
 import { usePromptBuilderStore } from "@/store/prompt-builder-store";
 
+export type FeedbackStreamAction =
+  | { type: "feedback-delta"; delta: string }
+  | { type: "verdict"; criteriaChecks: FeedbackCriterionCheck[] }
+  | { type: "error"; message: string }
+  | { type: "done" };
+
+export function resolveFeedbackStreamEvent(
+  event: string,
+  data: string,
+): FeedbackStreamAction | null {
+  switch (event) {
+    case "feedback-delta":
+      return { type: "feedback-delta", delta: data };
+    case "verdict": {
+      const verdict = JSON.parse(data) as { criteriaChecks: FeedbackCriterionCheck[] };
+      return { type: "verdict", criteriaChecks: verdict.criteriaChecks };
+    }
+    case "error":
+      return { type: "error", message: data };
+    case "done":
+      return { type: "done" };
+    default:
+      return null;
+  }
+}
+
 export async function requestFeedback(input: FeedbackInput) {
   const { startFeedback, appendFeedback, setFeedbackVerdict, setFeedbackDone, setFeedbackError } =
     usePromptBuilderStore.getState();
@@ -20,15 +46,21 @@ export async function requestFeedback(input: FeedbackInput) {
     }
 
     for await (const { event, data } of parseSSE(response)) {
-      if (event === "feedback-delta") {
-        appendFeedback(data);
-      } else if (event === "verdict") {
-        const verdict = JSON.parse(data) as { criteriaChecks: FeedbackCriterionCheck[] };
-        setFeedbackVerdict(verdict.criteriaChecks);
-      } else if (event === "error") {
-        throw new Error(data);
-      } else if (event === "done") {
-        setFeedbackDone();
+      const action = resolveFeedbackStreamEvent(event, data);
+      if (!action) continue;
+
+      switch (action.type) {
+        case "feedback-delta":
+          appendFeedback(action.delta);
+          break;
+        case "verdict":
+          setFeedbackVerdict(action.criteriaChecks);
+          break;
+        case "error":
+          throw new Error(action.message);
+        case "done":
+          setFeedbackDone();
+          break;
       }
     }
   } catch (error) {
