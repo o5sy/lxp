@@ -2,7 +2,7 @@
 
 import { useMemo, useRef, useState } from "react";
 
-import { isLocallyRecognized } from "@/features/prompt-builder/data/concept-whitelist";
+import { findClosestKeyword, isLocallyRecognized } from "@/features/prompt-builder/data/concept-whitelist";
 import { CONCEPT_SUGGESTIONS } from "@/features/prompt-builder/lib/options";
 import { useDebouncedValue } from "@/shared/hooks/use-debounced-value";
 import { cn } from "@/shared/lib/utils";
@@ -72,6 +72,10 @@ export function ConceptStep() {
     () => isLocallyRecognized(debouncedTypedText),
     [debouncedTypedText],
   );
+  // 화이트리스트에 완전히 매치되진 않지만("useStat"처럼 오타/미완성) 키워드
+  // 하나와 아주 가까우면 보정 제안을 보여준다 - 애매한 값을 LLM의 관대한
+  // 해석에 맡기지 않고, 명확한 키워드로 고쳐서 진행하도록 유도한다.
+  const suggestion = useMemo(() => findClosestKeyword(debouncedTypedText), [debouncedTypedText]);
 
   const clearGhostState = () => {
     setIsGhostShown(false);
@@ -325,6 +329,20 @@ export function ConceptStep() {
         <p className="text-amber-500 font-mono text-xs">{conceptCheckReason}</p>
       ) : conceptCheckStatus === "checking" ? (
         <p className="text-faint font-mono text-xs">확인하는 중...</p>
+      ) : suggestion ? (
+        <p className="font-mono text-xs">
+          <span className="text-amber-500">혹시 </span>
+          <button
+            type="button"
+            onClick={() => setConcept(suggestion)}
+            className="text-primary cursor-pointer underline underline-offset-2"
+          >
+            {suggestion}
+          </button>
+          <span className="text-amber-500">
+            {"을(를) 말씀하신 건가요? 맞으면 눌러서 적용해주세요."}
+          </span>
+        </p>
       ) : debouncedRecognized ? (
         <p className="text-faint font-mono text-xs">✓ 프론트엔드 개념으로 인식했어요</p>
       ) : null}

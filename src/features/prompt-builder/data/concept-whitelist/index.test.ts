@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { isLocallyRecognized } from "./index";
+import { findClosestKeyword, isLocallyRecognized } from "./index";
 
 describe("isLocallyRecognized", () => {
   it("빈 문자열은 인식하지 않는다", () => {
@@ -41,5 +41,27 @@ describe("isLocallyRecognized", () => {
 
   it("코드 실습으로 옮길 수 없는 개념도 화이트리스트 관점에서는 그냥 미인식이다", () => {
     expect(isLocallyRecognized("하네스 엔지니어링")).toBe(false);
+  });
+});
+
+describe("findClosestKeyword", () => {
+  it("키워드에 아주 가까운 오타/미완성 입력은 보정 후보를 제안한다", () => {
+    expect(findClosestKeyword("useStat")).toBe("useState");
+  });
+
+  it("이미 완전히 매치되는 입력에는 제안하지 않는다", () => {
+    expect(findClosestKeyword("useState")).toBeNull();
+  });
+
+  it("너무 짧은 입력(2자 이하)에는 제안하지 않는다", () => {
+    expect(findClosestKeyword("us")).toBeNull();
+  });
+
+  it("어떤 키워드와도 충분히 가깝지 않으면 제안하지 않는다", () => {
+    expect(findClosestKeyword("하네스 엔지니어링")).toBeNull();
+  });
+
+  it("화이트리스트에 없는 정상 개념에는 제안하지 않는다", () => {
+    expect(findClosestKeyword("웹 접근성")).toBeNull();
   });
 });
