@@ -17,6 +17,20 @@ describe("resolvePracticeStreamEvent", () => {
     });
   });
 
+  it("rejected 이벤트는 rejected 액션으로 변환한다", () => {
+    expect(resolvePracticeStreamEvent("rejected", "코드 실습으로 옮길 수 없는 개념입니다")).toEqual({
+      type: "rejected",
+      reason: "코드 실습으로 옮길 수 없는 개념입니다",
+    });
+  });
+
+  it("suggestion 이벤트는 suggestion 액션으로 변환한다", () => {
+    expect(resolvePracticeStreamEvent("suggestion", "useSuspenseQuery")).toEqual({
+      type: "suggestion",
+      suggestion: "useSuspenseQuery",
+    });
+  });
+
   it("error 이벤트는 error 액션으로 변환한다", () => {
     expect(resolvePracticeStreamEvent("error", "실패 사유")).toEqual({
       type: "error",

@@ -3,6 +3,7 @@ import { Fraunces, Instrument_Sans, JetBrains_Mono, Nanum_Gothic_Coding } from "
 import "./globals.css";
 
 import { ThemeProvider } from "@/shared/hooks/use-theme";
+import { OfflineToast } from "@/shared/ui/offline-toast";
 
 const THEME_INIT_SCRIPT = `(function () {
   try {
@@ -55,7 +56,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
       </head>
       <body className="font-body flex min-h-full flex-col">
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          {children}
+          <OfflineToast />
+        </ThemeProvider>
       </body>
     </html>
   );

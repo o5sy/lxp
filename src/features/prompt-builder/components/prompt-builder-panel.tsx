@@ -3,6 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { findClosestKeyword, isLocallyRecognized } from "@/features/prompt-builder/data/concept-whitelist";
+import { checkConceptValidity } from "@/features/prompt-builder/lib/check-concept-validity";
 import { BUILDER_STEP_LABELS } from "@/features/prompt-builder/lib/options";
 import { StepRail } from "@/shared/ui/step-rail";
 import { TOTAL_BUILDER_STEPS, usePromptBuilderStore } from "@/store/prompt-builder-store";
@@ -27,12 +29,55 @@ export function PromptBuilderPanel() {
   const difficulty = usePromptBuilderStore((state) => state.difficulty);
   const goNext = usePromptBuilderStore((state) => state.goNext);
   const goBack = usePromptBuilderStore((state) => state.goBack);
+  const conceptCheckStatus = usePromptBuilderStore((state) => state.conceptCheckStatus);
+  const startConceptCheck = usePromptBuilderStore((state) => state.startConceptCheck);
+  const setConceptCheckValid = usePromptBuilderStore((state) => state.setConceptCheckValid);
+  const setConceptCheckInvalid = usePromptBuilderStore((state) => state.setConceptCheckInvalid);
+  const setConceptSuggestion = usePromptBuilderStore((state) => state.setConceptSuggestion);
 
   const canGoNext = (step === 1 && concept.trim().length > 0) || (step === 2 && difficulty !== null);
+  const isCheckingConcept = conceptCheckStatus === "checking";
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const handleNext = async () => {
+    if (step === 1) {
+      // 1. 로컬에서 오타/미완성 입력(화이트리스트 키워드와 아주 가깝지만
+      //    완전히 일치하진 않는 경우)인지 지금(클릭 시점) 판별한다. 타이핑
+      //    중에는 이 체크를 하지 않는다 - "다음"을 눌렀을 때만 확인한다.
+      const suggestion = findClosestKeyword(concept);
+      if (suggestion) {
+        setConceptSuggestion(suggestion);
+        return; // LLM 호출 없이 보정 제안부터 보여주고 멈춘다.
+      }
+
+      // 2. 화이트리스트에 명백히 매치되지도, 오타/미완성 후보도 아닌 애매한
+      //    입력만 LLM 호출로 판별한다.
+      if (conceptCheckStatus !== "valid" && !isLocallyRecognized(concept)) {
+        startConceptCheck();
+        const result = await checkConceptValidity(concept);
+        if (!result.valid) {
+          // LLM이 오타/축약형으로 보인다고 판단해 보정 제안을 준 경우, 화이트리스트
+          // 기반 제안과 같은 UI(conceptSuggestion)로 보여준다.
+          if ("suggestion" in result) {
+            setConceptSuggestion(result.suggestion);
+          } else {
+            setConceptCheckInvalid(result.reason);
+          }
+          return;
+        }
+        setConceptCheckValid();
+      }
+    }
+    goNext();
+  };
+
   const handleSubmit = () => {
+    // 오프라인 상태에서 router.push()를 시도하면(App Router가 RSC 페이로드를
+    // 네트워크로 가져와야 해서) 브라우저가 우리 화면 대신 자체 "사이트에
+    // 연결할 수 없음" 오류 화면으로 가버린다. 전역 OfflineToast가 이미
+    // 안내하고 있으니, 여기서는 그냥 이동을 시도하지 않는다.
+    if (!navigator.onLine) return;
     setIsSubmitting(true);
     router.push(`/practice/${slugify(concept)}`);
   };
@@ -65,11 +110,11 @@ export function PromptBuilderPanel() {
         {step < TOTAL_BUILDER_STEPS ? (
           <button
             type="button"
-            disabled={!canGoNext}
-            onClick={goNext}
+            disabled={!canGoNext || isCheckingConcept}
+            onClick={handleNext}
             className="bg-primary text-primary-foreground cursor-pointer rounded-md px-4 py-2 font-mono text-xs font-medium disabled:cursor-not-allowed disabled:opacity-50"
           >
-            다음 →
+            {isCheckingConcept ? "확인하는 중..." : "다음 →"}
           </button>
         ) : (
           <button

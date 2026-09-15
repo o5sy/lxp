@@ -4,7 +4,9 @@ import type { FeedbackCriterionCheck } from "@/lib/llm/types";
 
 export type PracticeDifficulty = "typing" | "apply" | "stretch";
 
-export type AsyncStatus = "idle" | "loading" | "streaming" | "done" | "error";
+export type AsyncStatus = "idle" | "loading" | "streaming" | "done" | "error" | "rejected";
+
+export type ConceptCheckStatus = "idle" | "checking" | "valid" | "invalid";
 
 export const TOTAL_BUILDER_STEPS = 3;
 
@@ -23,17 +25,32 @@ type PromptBuilderState = {
   setFreeText: (freeText: string) => void;
   goNext: () => void;
   goBack: () => void;
+  returnToConceptStep: () => void;
   reset: () => void;
+
+  conceptCheckStatus: ConceptCheckStatus;
+  conceptCheckReason: string | null;
+  startConceptCheck: () => void;
+  setConceptCheckValid: () => void;
+  setConceptCheckInvalid: (reason: string) => void;
+
+  // 화이트리스트 키워드와 아주 가까운 오타/미완성 입력에 대한 보정 제안.
+  // 실시간 타이핑 중에는 계산하지 않고, "다음" 클릭 시점(prompt-builder-panel.tsx
+  // handleNext)에만 채워진다 - concept-step.tsx는 이 값을 표시만 한다.
+  conceptSuggestion: string | null;
+  setConceptSuggestion: (suggestion: string | null) => void;
 
   generationStatus: AsyncStatus;
   instruction: string;
   starterCode: string | null;
   generationError: string | null;
+  rejectionReason: string | null;
   startGeneration: () => void;
   appendInstruction: (delta: string) => void;
   setStarterCode: (code: string) => void;
   setGenerationDone: () => void;
   setGenerationError: (message: string) => void;
+  setConceptRejected: (reason: string) => void;
 
   feedbackStatus: AsyncStatus;
   feedbackRounds: FeedbackRound[];
@@ -50,24 +67,59 @@ export const usePromptBuilderStore = create<PromptBuilderState>((set) => ({
   concept: "",
   difficulty: null,
   freeText: "",
-  setConcept: (concept) => set({ concept }),
+  // 개념 텍스트가 바뀌면 이전 판별 결과/보정 제안은 더 이상 유효하지 않다.
+  setConcept: (concept) =>
+    set({ concept, conceptCheckStatus: "idle", conceptCheckReason: null, conceptSuggestion: null }),
   setDifficulty: (difficulty) => set({ difficulty }),
   setFreeText: (freeText) => set({ freeText }),
   goNext: () => set((state) => ({ step: Math.min(state.step + 1, TOTAL_BUILDER_STEPS) })),
   goBack: () => set((state) => ({ step: Math.max(state.step - 1, 1) })),
-  reset: () => set({ step: 1, concept: "", difficulty: null, freeText: "" }),
+  returnToConceptStep: () =>
+    set({ step: 1, conceptCheckStatus: "idle", conceptCheckReason: null, conceptSuggestion: null }),
+  reset: () =>
+    set({
+      step: 1,
+      concept: "",
+      difficulty: null,
+      freeText: "",
+      conceptCheckStatus: "idle",
+      conceptCheckReason: null,
+      conceptSuggestion: null,
+    }),
+
+  conceptCheckStatus: "idle",
+  conceptCheckReason: null,
+  startConceptCheck: () => set({ conceptCheckStatus: "checking", conceptCheckReason: null }),
+  setConceptCheckValid: () => set({ conceptCheckStatus: "valid", conceptCheckReason: null }),
+  setConceptCheckInvalid: (reason) => set({ conceptCheckStatus: "invalid", conceptCheckReason: reason }),
+
+  conceptSuggestion: null,
+  // conceptCheckStatus도 idle로 되돌린다 - LLM 판별(checking) 도중 제안이
+  // 도착했을 때 이걸 빠뜨리면 checking 상태가 영영 안 풀려서, 버튼과
+  // concept-step.tsx 둘 다 "확인하는 중..."에 멈춰버린다(실제로 발견된
+  // 버그: useSuspenseQuer 같은 LLM 경유 제안에서 재현됨. useStat처럼 로컬
+  // 매치는 애초에 checking에 들어가지 않아 멀쩡했다).
+  setConceptSuggestion: (suggestion) => set({ conceptSuggestion: suggestion, conceptCheckStatus: "idle" }),
 
   generationStatus: "idle",
   instruction: "",
   starterCode: null,
   generationError: null,
+  rejectionReason: null,
   startGeneration: () =>
-    set({ generationStatus: "loading", instruction: "", starterCode: null, generationError: null }),
+    set({
+      generationStatus: "loading",
+      instruction: "",
+      starterCode: null,
+      generationError: null,
+      rejectionReason: null,
+    }),
   appendInstruction: (delta) =>
     set((state) => ({ generationStatus: "streaming", instruction: state.instruction + delta })),
   setStarterCode: (code) => set({ starterCode: code }),
   setGenerationDone: () => set({ generationStatus: "done" }),
   setGenerationError: (message) => set({ generationStatus: "error", generationError: message }),
+  setConceptRejected: (reason) => set({ generationStatus: "rejected", rejectionReason: reason }),
 
   feedbackStatus: "idle",
   feedbackRounds: [],
