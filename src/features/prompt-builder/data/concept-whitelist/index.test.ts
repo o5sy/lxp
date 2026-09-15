@@ -42,6 +42,14 @@ describe("isLocallyRecognized", () => {
   it("코드 실습으로 옮길 수 없는 개념도 화이트리스트 관점에서는 그냥 미인식이다", () => {
     expect(isLocallyRecognized("하네스 엔지니어링")).toBe(false);
   });
+
+  it("짧고 흔한 단어(event 등)는 키워드로 넣지 않아, 이어 타이핑해도 잘못 들러붙지 않는다", () => {
+    // "event"가 화이트리스트에 있으면 "eventloo"(이벤트 루프를 이어 타이핑하는 중)도
+    // 계속 인식됨으로 남는 회귀가 있었다. "event" 자체는 화이트리스트에 없어야 한다.
+    expect(isLocallyRecognized("event")).toBe(false);
+    expect(isLocallyRecognized("eventloo")).toBe(false);
+    expect(isLocallyRecognized("prevent")).toBe(false);
+  });
 });
 
 describe("findClosestKeyword", () => {
