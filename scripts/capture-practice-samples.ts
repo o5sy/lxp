@@ -10,13 +10,19 @@ import { practiceGenerationSchema, type PracticeGenerationInput } from "@/lib/ll
 
 const FIXTURES_DIR = path.join(process.cwd(), "fixtures", "practice-samples");
 
-// 1차 샘플: typing 난이도 × 3개 개념. rubric을 보정한 뒤 apply/stretch나 다른 개념으로 확장한다.
-// 이미 캡처된 조합은 건너뛰므로(아래 idempotent 체크), 나중에 이 배열에 항목을 추가해서
-// 재실행해도 기존 조합을 다시 호출하지 않는다.
+// 3개 개념 × 3개 난이도(typing/apply/stretch) = 9건. 이미 캡처된 조합은
+// 건너뛰므로(아래 idempotent 체크), 이 배열에 항목을 추가해서 재실행해도
+// 기존 조합을 다시 호출하지 않는다.
 const SAMPLES_TO_CAPTURE: PracticeGenerationInput[] = [
   { concept: "useState", difficulty: "typing", freeText: "" },
   { concept: "클로저", difficulty: "typing", freeText: "" },
   { concept: "CSS flexbox", difficulty: "typing", freeText: "" },
+  { concept: "useState", difficulty: "apply", freeText: "" },
+  { concept: "클로저", difficulty: "apply", freeText: "" },
+  { concept: "CSS flexbox", difficulty: "apply", freeText: "" },
+  { concept: "useState", difficulty: "stretch", freeText: "" },
+  { concept: "클로저", difficulty: "stretch", freeText: "" },
+  { concept: "CSS flexbox", difficulty: "stretch", freeText: "" },
 ];
 
 function slugify(input: PracticeGenerationInput) {

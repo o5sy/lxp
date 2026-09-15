@@ -1,0 +1,14 @@
+{
+  "input": {
+    "concept": "클로저",
+    "difficulty": "stretch",
+    "freeText": ""
+  },
+  "output": {
+    "status": "valid",
+    "reason": "",
+    "suggestedCorrection": "작성한 개념이 정확합니다. 계속 진행하세요. (수정 불필요: 클로저자체는 올바른 명칭입니다.)"
+  },
+  "model": "gemini-3.6-flash",
+  "capturedAt": "2026-09-15T11:48:39.841Z"
+}
