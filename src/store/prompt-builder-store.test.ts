@@ -112,6 +112,15 @@ describe("개념 보정 제안(conceptSuggestion)", () => {
     expect(usePromptBuilderStore.getState().conceptSuggestion).toBe("useState");
   });
 
+  it("setConcept으로 개념 텍스트가 바뀌면 이전 보정 제안도 지운다", () => {
+    const { setConceptSuggestion, setConcept } = usePromptBuilderStore.getState();
+
+    setConceptSuggestion("useState");
+    setConcept("useEffect");
+
+    expect(usePromptBuilderStore.getState().conceptSuggestion).toBeNull();
+  });
+
   it("returnToConceptStep은 남아있던 보정 제안도 초기화한다", () => {
     const { setConceptSuggestion, returnToConceptStep } = usePromptBuilderStore.getState();
 

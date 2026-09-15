@@ -34,9 +34,9 @@ type PromptBuilderState = {
   setConceptCheckValid: () => void;
   setConceptCheckInvalid: (reason: string) => void;
 
-  // 화이트리스트 키워드와 아주 가까운 오타/미완성 입력에 대한 보정 제안(디바운스
-  // 적용 후 값). concept-step.tsx가 갱신하고, prompt-builder-panel.tsx의 "다음"
-  // 버튼 게이팅이 같은 값을 읽어 화면 표시와 버튼 상태가 어긋나지 않게 한다.
+  // 화이트리스트 키워드와 아주 가까운 오타/미완성 입력에 대한 보정 제안.
+  // 실시간 타이핑 중에는 계산하지 않고, "다음" 클릭 시점(prompt-builder-panel.tsx
+  // handleNext)에만 채워진다 - concept-step.tsx는 이 값을 표시만 한다.
   conceptSuggestion: string | null;
   setConceptSuggestion: (suggestion: string | null) => void;
 
@@ -67,8 +67,9 @@ export const usePromptBuilderStore = create<PromptBuilderState>((set) => ({
   concept: "",
   difficulty: null,
   freeText: "",
-  // 개념 텍스트가 바뀌면 이전 판별 결과는 더 이상 유효하지 않다.
-  setConcept: (concept) => set({ concept, conceptCheckStatus: "idle", conceptCheckReason: null }),
+  // 개념 텍스트가 바뀌면 이전 판별 결과/보정 제안은 더 이상 유효하지 않다.
+  setConcept: (concept) =>
+    set({ concept, conceptCheckStatus: "idle", conceptCheckReason: null, conceptSuggestion: null }),
   setDifficulty: (difficulty) => set({ difficulty }),
   setFreeText: (freeText) => set({ freeText }),
   goNext: () => set((state) => ({ step: Math.min(state.step + 1, TOTAL_BUILDER_STEPS) })),

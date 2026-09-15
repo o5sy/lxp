@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 
-import { findClosestKeyword, isLocallyRecognized } from "@/features/prompt-builder/data/concept-whitelist";
+import { isLocallyRecognized } from "@/features/prompt-builder/data/concept-whitelist";
 import { CONCEPT_SUGGESTIONS } from "@/features/prompt-builder/lib/options";
 import { useDebouncedValue } from "@/shared/hooks/use-debounced-value";
 import { cn } from "@/shared/lib/utils";
@@ -25,7 +25,9 @@ export function ConceptStep() {
   const setConcept = usePromptBuilderStore((state) => state.setConcept);
   const conceptCheckStatus = usePromptBuilderStore((state) => state.conceptCheckStatus);
   const conceptCheckReason = usePromptBuilderStore((state) => state.conceptCheckReason);
-  const setConceptSuggestion = usePromptBuilderStore((state) => state.setConceptSuggestion);
+  // "다음" 클릭 시점(prompt-builder-panel.tsx)에만 채워진다 - 타이핑 중에는
+  // 계산하지 않는다.
+  const conceptSuggestion = usePromptBuilderStore((state) => state.conceptSuggestion);
   const [isOpen, setIsOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
   // 인라인 자동완성(ghost)이 현재 화면에 보이는지 - 선택 영역 스타일링에 쓴다.
@@ -73,16 +75,6 @@ export function ConceptStep() {
     () => isLocallyRecognized(debouncedTypedText),
     [debouncedTypedText],
   );
-  // 화이트리스트에 완전히 매치되진 않지만("useStat"처럼 오타/미완성) 키워드
-  // 하나와 아주 가까우면 보정 제안을 보여준다 - 애매한 값을 LLM의 관대한
-  // 해석에 맡기지 않고, 명확한 키워드로 고쳐서 진행하도록 유도한다.
-  const suggestion = useMemo(() => findClosestKeyword(debouncedTypedText), [debouncedTypedText]);
-  // prompt-builder-panel.tsx의 "다음" 버튼 게이팅이 화면에 보이는 것과 같은
-  // (디바운스된) 값을 보도록, 이 컴포넌트가 유일하게 아는 ghost 제외+디바운스
-  // 결과를 스토어로 올려준다.
-  useEffect(() => {
-    setConceptSuggestion(suggestion);
-  }, [suggestion, setConceptSuggestion]);
 
   const clearGhostState = () => {
     setIsGhostShown(false);
@@ -336,15 +328,15 @@ export function ConceptStep() {
         <p className="text-amber-500 font-mono text-xs">{conceptCheckReason}</p>
       ) : conceptCheckStatus === "checking" ? (
         <p className="text-faint font-mono text-xs">확인하는 중...</p>
-      ) : suggestion ? (
+      ) : conceptSuggestion ? (
         <p className="font-mono text-xs">
           <span className="text-amber-500">혹시 </span>
           <button
             type="button"
-            onClick={() => setConcept(suggestion)}
+            onClick={() => setConcept(conceptSuggestion)}
             className="text-primary cursor-pointer underline underline-offset-2"
           >
-            {suggestion}
+            {conceptSuggestion}
           </button>
           <span className="text-amber-500">
             {"을(를) 말씀하신 건가요? 맞으면 눌러서 적용해주세요."}
