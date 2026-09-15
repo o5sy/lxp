@@ -52,7 +52,10 @@ export async function POST(request: Request) {
             system,
             prompt,
           });
-          if (final.status === "invalid" && !locallyRecognized) {
+          if (final.suggestedCorrection) {
+            // 오타/축약형으로 보이는 경우 - 거부가 아니라 정확한 이름을 제안한다.
+            controller.enqueue(encoder.encode(sseEvent("suggestion", final.suggestedCorrection)));
+          } else if (final.status === "invalid" && !locallyRecognized) {
             controller.enqueue(
               encoder.encode(sseEvent("rejected", final.reason || "이 개념은 코드 실습으로 만들기 어려워요.")),
             );
@@ -84,7 +87,9 @@ export async function POST(request: Request) {
           const final = await result.object;
           const rejected = final.status === "invalid" && !locallyRecognized;
 
-          if (rejected) {
+          if (final.suggestedCorrection) {
+            controller.enqueue(encoder.encode(sseEvent("suggestion", final.suggestedCorrection)));
+          } else if (rejected) {
             controller.enqueue(
               encoder.encode(sseEvent("rejected", final.reason || "이 개념은 코드 실습으로 만들기 어려워요.")),
             );

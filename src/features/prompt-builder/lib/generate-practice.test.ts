@@ -24,6 +24,13 @@ describe("resolvePracticeStreamEvent", () => {
     });
   });
 
+  it("suggestion 이벤트는 suggestion 액션으로 변환한다", () => {
+    expect(resolvePracticeStreamEvent("suggestion", "useSuspenseQuery")).toEqual({
+      type: "suggestion",
+      suggestion: "useSuspenseQuery",
+    });
+  });
+
   it("error 이벤트는 error 액션으로 변환한다", () => {
     expect(resolvePracticeStreamEvent("error", "실패 사유")).toEqual({
       type: "error",

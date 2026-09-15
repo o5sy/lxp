@@ -13,6 +13,12 @@ export const practiceGenerationSchema = z.object({
     .describe(
       "status가 invalid일 때, 학습자가 이해할 수 있게 왜 이 개념을 코드 실습으로 만들기 어려운지 간결히 설명한다. status가 valid면 빈 문자열로 둔다.",
     ),
+  suggestedCorrection: z
+    .string()
+    .optional()
+    .describe(
+      "학습자가 입력한 텍스트가 오타나 축약형처럼 보이지만 실존하는 프론트엔드 개념/라이브러리 API를 가리키는 게 명백하면(예: 'useSuspenseQuer' → TanStack Query의 'useSuspenseQuery', 'useStat' → React의 'useState'), 정확한 전체 이름을 여기에 적는다. 이 필드를 채우면 status/reason 판정 대신 이 제안이 우선한다. 이미 정확한 이름이거나 오타로 보이지 않으면 비워둔다.",
+    ),
   instruction: z
     .string()
     .optional()
@@ -29,7 +35,11 @@ export type PracticeGeneration = z.infer<typeof practiceGenerationSchema>;
 
 // practiceGenerationSchema에서 판별 필드만 뽑아낸 스키마. 1단계 개념 사전 판별처럼
 // 실습 본문(instruction/starterCode)까지는 필요 없는 가벼운 호출에 쓴다.
-export const conceptValiditySchema = practiceGenerationSchema.pick({ status: true, reason: true });
+export const conceptValiditySchema = practiceGenerationSchema.pick({
+  status: true,
+  reason: true,
+  suggestedCorrection: true,
+});
 
 export type ConceptValidity = z.infer<typeof conceptValiditySchema>;
 

@@ -1,6 +1,9 @@
 import { parseSSE } from "@/shared/lib/parse-sse";
 
-export type ConceptCheckResult = { valid: true } | { valid: false; reason: string };
+export type ConceptCheckResult =
+  | { valid: true }
+  | { valid: false; reason: string }
+  | { valid: false; suggestion: string };
 
 /**
  * 1단계에서 화이트리스트에 없는 개념을 제출하기 전에, 실습 본문 없이 판별
@@ -20,6 +23,7 @@ export async function checkConceptValidity(concept: string): Promise<ConceptChec
     }
 
     for await (const { event, data } of parseSSE(response)) {
+      if (event === "suggestion") return { valid: false, suggestion: data };
       if (event === "rejected") return { valid: false, reason: data };
       if (event === "done") return { valid: true };
       if (event === "error") return { valid: true };

@@ -57,7 +57,13 @@ export function PromptBuilderPanel() {
         startConceptCheck();
         const result = await checkConceptValidity(concept);
         if (!result.valid) {
-          setConceptCheckInvalid(result.reason);
+          // LLM이 오타/축약형으로 보인다고 판단해 보정 제안을 준 경우, 화이트리스트
+          // 기반 제안과 같은 UI(conceptSuggestion)로 보여준다.
+          if ("suggestion" in result) {
+            setConceptSuggestion(result.suggestion);
+          } else {
+            setConceptCheckInvalid(result.reason);
+          }
           return;
         }
         setConceptCheckValid();
