@@ -1,7 +1,7 @@
 import { generateObject, streamObject } from "ai";
 
 import { isLocallyRecognized } from "@/features/prompt-builder/data/concept-whitelist";
-import { buildPracticePrompt } from "@/features/prompt-builder/lib/build-prompt";
+import { buildConceptCheckPrompt, buildPracticePrompt } from "@/features/prompt-builder/lib/build-prompt";
 import { getModel, getValidationModel } from "@/lib/llm";
 import { conceptValiditySchema, practiceGenerationSchema, type PracticeGenerationInput } from "@/lib/llm/types";
 
@@ -33,7 +33,6 @@ export async function POST(request: Request) {
     return new Response("concept과 difficulty는 필수입니다.", { status: 400 });
   }
 
-  const { system, prompt } = buildPracticePrompt(input);
   const locallyRecognized = isLocallyRecognized(input.concept);
 
   const stream = new ReadableStream<Uint8Array>({
@@ -42,10 +41,12 @@ export async function POST(request: Request) {
 
       try {
         if (input.checkOnly) {
-          // 1단계 사전 판별: 실습 본문은 필요 없으니 경량 모델 + 축소 스키마로
-          // 판별 필드만 받는다. 스트리밍이 필요 없고(전체 결과가 짧다),
+          // 1단계 사전 판별: 실습 본문은 필요 없으니 경량 모델 + 축소 스키마 +
+          // 짧은 전용 프롬프트(지시문/시작코드 작성 규칙 등 판별에 무관한
+          // 내용 제외)로 받는다. 스트리밍이 필요 없고(전체 결과가 짧다),
           // gemini-flash-lite 계열은 streamObject와 조합 시 응답이 멈추는
           // 문제가 있어 generateObject(non-streaming)를 쓴다.
+          const { system, prompt } = buildConceptCheckPrompt(input.concept);
           const { object: final } = await generateObject({
             model: getValidationModel(),
             schema: conceptValiditySchema,
@@ -63,6 +64,7 @@ export async function POST(request: Request) {
             controller.enqueue(encoder.encode(sseEvent("done", "")));
           }
         } else {
+          const { system, prompt } = buildPracticePrompt(input);
           let sentInstructionLength = 0;
           const result = streamObject({
             model: getModel(),
