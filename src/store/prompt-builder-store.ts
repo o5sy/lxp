@@ -94,7 +94,12 @@ export const usePromptBuilderStore = create<PromptBuilderState>((set) => ({
   setConceptCheckInvalid: (reason) => set({ conceptCheckStatus: "invalid", conceptCheckReason: reason }),
 
   conceptSuggestion: null,
-  setConceptSuggestion: (suggestion) => set({ conceptSuggestion: suggestion }),
+  // conceptCheckStatus도 idle로 되돌린다 - LLM 판별(checking) 도중 제안이
+  // 도착했을 때 이걸 빠뜨리면 checking 상태가 영영 안 풀려서, 버튼과
+  // concept-step.tsx 둘 다 "확인하는 중..."에 멈춰버린다(실제로 발견된
+  // 버그: useSuspenseQuer 같은 LLM 경유 제안에서 재현됨. useStat처럼 로컬
+  // 매치는 애초에 checking에 들어가지 않아 멀쩡했다).
+  setConceptSuggestion: (suggestion) => set({ conceptSuggestion: suggestion, conceptCheckStatus: "idle" }),
 
   generationStatus: "idle",
   instruction: "",

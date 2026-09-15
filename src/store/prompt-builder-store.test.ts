@@ -112,6 +112,17 @@ describe("개념 보정 제안(conceptSuggestion)", () => {
     expect(usePromptBuilderStore.getState().conceptSuggestion).toBe("useState");
   });
 
+  it("setConceptSuggestion은 checking 상태를 idle로 되돌린다 (LLM 판별 도중 제안이 온 경우 멈추지 않도록)", () => {
+    const { startConceptCheck, setConceptSuggestion } = usePromptBuilderStore.getState();
+
+    startConceptCheck();
+    expect(usePromptBuilderStore.getState().conceptCheckStatus).toBe("checking");
+
+    setConceptSuggestion("useSuspenseQuery");
+
+    expect(usePromptBuilderStore.getState().conceptCheckStatus).toBe("idle");
+  });
+
   it("setConcept으로 개념 텍스트가 바뀌면 이전 보정 제안도 지운다", () => {
     const { setConceptSuggestion, setConcept } = usePromptBuilderStore.getState();
 
