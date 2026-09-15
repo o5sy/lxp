@@ -34,6 +34,12 @@ type PromptBuilderState = {
   setConceptCheckValid: () => void;
   setConceptCheckInvalid: (reason: string) => void;
 
+  // 화이트리스트 키워드와 아주 가까운 오타/미완성 입력에 대한 보정 제안(디바운스
+  // 적용 후 값). concept-step.tsx가 갱신하고, prompt-builder-panel.tsx의 "다음"
+  // 버튼 게이팅이 같은 값을 읽어 화면 표시와 버튼 상태가 어긋나지 않게 한다.
+  conceptSuggestion: string | null;
+  setConceptSuggestion: (suggestion: string | null) => void;
+
   generationStatus: AsyncStatus;
   instruction: string;
   starterCode: string | null;
@@ -67,15 +73,27 @@ export const usePromptBuilderStore = create<PromptBuilderState>((set) => ({
   setFreeText: (freeText) => set({ freeText }),
   goNext: () => set((state) => ({ step: Math.min(state.step + 1, TOTAL_BUILDER_STEPS) })),
   goBack: () => set((state) => ({ step: Math.max(state.step - 1, 1) })),
-  returnToConceptStep: () => set({ step: 1, conceptCheckStatus: "idle", conceptCheckReason: null }),
+  returnToConceptStep: () =>
+    set({ step: 1, conceptCheckStatus: "idle", conceptCheckReason: null, conceptSuggestion: null }),
   reset: () =>
-    set({ step: 1, concept: "", difficulty: null, freeText: "", conceptCheckStatus: "idle", conceptCheckReason: null }),
+    set({
+      step: 1,
+      concept: "",
+      difficulty: null,
+      freeText: "",
+      conceptCheckStatus: "idle",
+      conceptCheckReason: null,
+      conceptSuggestion: null,
+    }),
 
   conceptCheckStatus: "idle",
   conceptCheckReason: null,
   startConceptCheck: () => set({ conceptCheckStatus: "checking", conceptCheckReason: null }),
   setConceptCheckValid: () => set({ conceptCheckStatus: "valid", conceptCheckReason: null }),
   setConceptCheckInvalid: (reason) => set({ conceptCheckStatus: "invalid", conceptCheckReason: reason }),
+
+  conceptSuggestion: null,
+  setConceptSuggestion: (suggestion) => set({ conceptSuggestion: suggestion }),
 
   generationStatus: "idle",
   instruction: "",

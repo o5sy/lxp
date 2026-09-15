@@ -105,6 +105,32 @@ describe("개념 판별(conceptCheck)", () => {
   });
 });
 
+describe("개념 보정 제안(conceptSuggestion)", () => {
+  it("setConceptSuggestion은 제안 값을 저장한다", () => {
+    usePromptBuilderStore.getState().setConceptSuggestion("useState");
+
+    expect(usePromptBuilderStore.getState().conceptSuggestion).toBe("useState");
+  });
+
+  it("returnToConceptStep은 남아있던 보정 제안도 초기화한다", () => {
+    const { setConceptSuggestion, returnToConceptStep } = usePromptBuilderStore.getState();
+
+    setConceptSuggestion("useState");
+    returnToConceptStep();
+
+    expect(usePromptBuilderStore.getState().conceptSuggestion).toBeNull();
+  });
+
+  it("reset은 남아있던 보정 제안도 초기화한다", () => {
+    const { setConceptSuggestion, reset } = usePromptBuilderStore.getState();
+
+    setConceptSuggestion("useState");
+    reset();
+
+    expect(usePromptBuilderStore.getState().conceptSuggestion).toBeNull();
+  });
+});
+
 describe("실습 생성(generation) 상태", () => {
   it("setConceptRejected는 generationStatus를 rejected로 바꾸고 이유를 저장한다", () => {
     usePromptBuilderStore.getState().setConceptRejected("이 개념은 부적합해요");

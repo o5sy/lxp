@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { findClosestKeyword, isLocallyRecognized } from "@/features/prompt-builder/data/concept-whitelist";
 import { CONCEPT_SUGGESTIONS } from "@/features/prompt-builder/lib/options";
@@ -25,6 +25,7 @@ export function ConceptStep() {
   const setConcept = usePromptBuilderStore((state) => state.setConcept);
   const conceptCheckStatus = usePromptBuilderStore((state) => state.conceptCheckStatus);
   const conceptCheckReason = usePromptBuilderStore((state) => state.conceptCheckReason);
+  const setConceptSuggestion = usePromptBuilderStore((state) => state.setConceptSuggestion);
   const [isOpen, setIsOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
   // 인라인 자동완성(ghost)이 현재 화면에 보이는지 - 선택 영역 스타일링에 쓴다.
@@ -76,6 +77,12 @@ export function ConceptStep() {
   // 하나와 아주 가까우면 보정 제안을 보여준다 - 애매한 값을 LLM의 관대한
   // 해석에 맡기지 않고, 명확한 키워드로 고쳐서 진행하도록 유도한다.
   const suggestion = useMemo(() => findClosestKeyword(debouncedTypedText), [debouncedTypedText]);
+  // prompt-builder-panel.tsx의 "다음" 버튼 게이팅이 화면에 보이는 것과 같은
+  // (디바운스된) 값을 보도록, 이 컴포넌트가 유일하게 아는 ghost 제외+디바운스
+  // 결과를 스토어로 올려준다.
+  useEffect(() => {
+    setConceptSuggestion(suggestion);
+  }, [suggestion, setConceptSuggestion]);
 
   const clearGhostState = () => {
     setIsGhostShown(false);
