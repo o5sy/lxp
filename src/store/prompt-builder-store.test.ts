@@ -53,6 +53,79 @@ describe("reset", () => {
   });
 });
 
+describe("개념 판별(conceptCheck)", () => {
+  it("setConcept으로 개념 텍스트가 바뀌면 이전 판별 결과를 초기화한다", () => {
+    const { setConcept, setConceptCheckInvalid } = usePromptBuilderStore.getState();
+
+    setConceptCheckInvalid("이 개념은 코드 실습으로 만들기 어려워요");
+    setConcept("useEffect");
+
+    const state = usePromptBuilderStore.getState();
+    expect(state.conceptCheckStatus).toBe("idle");
+    expect(state.conceptCheckReason).toBeNull();
+  });
+
+  it("startConceptCheck은 checking 상태로 전환한다", () => {
+    usePromptBuilderStore.getState().startConceptCheck();
+
+    expect(usePromptBuilderStore.getState().conceptCheckStatus).toBe("checking");
+  });
+
+  it("setConceptCheckInvalid는 invalid 상태와 이유를 함께 저장한다", () => {
+    usePromptBuilderStore.getState().setConceptCheckInvalid("코드 실습으로 옮길 수 없어요");
+
+    const state = usePromptBuilderStore.getState();
+    expect(state.conceptCheckStatus).toBe("invalid");
+    expect(state.conceptCheckReason).toBe("코드 실습으로 옮길 수 없어요");
+  });
+
+  it("setConceptCheckValid는 valid 상태로 전환하고 이유를 지운다", () => {
+    const { setConceptCheckInvalid, setConceptCheckValid } = usePromptBuilderStore.getState();
+
+    setConceptCheckInvalid("일단 거부된 상태");
+    setConceptCheckValid();
+
+    const state = usePromptBuilderStore.getState();
+    expect(state.conceptCheckStatus).toBe("valid");
+    expect(state.conceptCheckReason).toBeNull();
+  });
+
+  it("returnToConceptStep은 1단계로 돌아가고 판별 상태를 초기화한다", () => {
+    const { goNext, setConceptCheckInvalid, returnToConceptStep } = usePromptBuilderStore.getState();
+
+    goNext();
+    goNext();
+    setConceptCheckInvalid("거부 사유");
+    returnToConceptStep();
+
+    const state = usePromptBuilderStore.getState();
+    expect(state.step).toBe(1);
+    expect(state.conceptCheckStatus).toBe("idle");
+    expect(state.conceptCheckReason).toBeNull();
+  });
+});
+
+describe("실습 생성(generation) 상태", () => {
+  it("setConceptRejected는 generationStatus를 rejected로 바꾸고 이유를 저장한다", () => {
+    usePromptBuilderStore.getState().setConceptRejected("이 개념은 부적합해요");
+
+    const state = usePromptBuilderStore.getState();
+    expect(state.generationStatus).toBe("rejected");
+    expect(state.rejectionReason).toBe("이 개념은 부적합해요");
+  });
+
+  it("startGeneration은 이전 거부 사유를 초기화한다", () => {
+    const { setConceptRejected, startGeneration } = usePromptBuilderStore.getState();
+
+    setConceptRejected("이전 거부 사유");
+    startGeneration();
+
+    const state = usePromptBuilderStore.getState();
+    expect(state.generationStatus).toBe("loading");
+    expect(state.rejectionReason).toBeNull();
+  });
+});
+
 describe("피드백 라운드", () => {
   it("startFeedback은 빈 라운드를 새로 추가한다", () => {
     usePromptBuilderStore.getState().startFeedback();
