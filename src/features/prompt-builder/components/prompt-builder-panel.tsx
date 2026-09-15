@@ -73,6 +73,11 @@ export function PromptBuilderPanel() {
   };
 
   const handleSubmit = () => {
+    // 오프라인 상태에서 router.push()를 시도하면(App Router가 RSC 페이로드를
+    // 네트워크로 가져와야 해서) 브라우저가 우리 화면 대신 자체 "사이트에
+    // 연결할 수 없음" 오류 화면으로 가버린다. 전역 OfflineToast가 이미
+    // 안내하고 있으니, 여기서는 그냥 이동을 시도하지 않는다.
+    if (!navigator.onLine) return;
     setIsSubmitting(true);
     router.push(`/practice/${slugify(concept)}`);
   };
