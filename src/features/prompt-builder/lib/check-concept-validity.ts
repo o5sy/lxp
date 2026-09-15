@@ -12,10 +12,14 @@ export type ConceptCheckResult =
  */
 export async function checkConceptValidity(concept: string): Promise<ConceptCheckResult> {
   try {
+    // 네트워크가 조용히 끊기면 fetch가 에러 없이 무한정 대기할 수 있다. 정상
+    // 응답은 보통 2~4초라 15초면 충분하고, 넘기면 그냥 아래 catch로 떨어져
+    // valid 처리된다(진행을 막지 않는 기존 방침과 동일).
     const response = await fetch("/api/practice", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ concept, difficulty: "typing", freeText: "", checkOnly: true }),
+      signal: AbortSignal.timeout(15_000),
     });
 
     if (!response.ok || !response.body) {
