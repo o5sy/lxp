@@ -72,7 +72,11 @@ export function SandpackSession() {
         {!starterCode && (
           <div className="bg-sunken/90 absolute inset-0 flex items-center justify-center">
             <p className="text-muted-foreground text-sm">
-              {generationStatus === "error" ? "실습 생성에 실패했습니다." : "실습을 생성하는 중입니다..."}
+              {generationStatus === "error"
+                ? "실습 생성에 실패했습니다."
+                : generationStatus === "rejected"
+                  ? "개념을 다시 입력해주세요."
+                  : "실습을 생성하는 중입니다..."}
             </p>
           </div>
         )}

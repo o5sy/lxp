@@ -2,7 +2,9 @@
 
 import { useMemo, useRef, useState } from "react";
 
+import { isLocallyRecognized } from "@/features/prompt-builder/data/concept-whitelist";
 import { CONCEPT_SUGGESTIONS } from "@/features/prompt-builder/lib/options";
+import { useDebouncedValue } from "@/shared/hooks/use-debounced-value";
 import { cn } from "@/shared/lib/utils";
 import { usePromptBuilderStore } from "@/store/prompt-builder-store";
 
@@ -21,6 +23,11 @@ function findPrefixMatch(query: string) {
 export function ConceptStep() {
   const concept = usePromptBuilderStore((state) => state.concept);
   const setConcept = usePromptBuilderStore((state) => state.setConcept);
+  const conceptCheckStatus = usePromptBuilderStore((state) => state.conceptCheckStatus);
+  const conceptCheckReason = usePromptBuilderStore((state) => state.conceptCheckReason);
+  // "다음" 클릭 시점(prompt-builder-panel.tsx)에만 채워진다 - 타이핑 중에는
+  // 계산하지 않는다.
+  const conceptSuggestion = usePromptBuilderStore((state) => state.conceptSuggestion);
   const [isOpen, setIsOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
   // 인라인 자동완성(ghost)이 현재 화면에 보이는지 - 선택 영역 스타일링에 쓴다.
@@ -41,6 +48,15 @@ export function ConceptStep() {
   // 사라진다 (예: "버블링" 입력 중 "블"이 통째로 날아가는 문제). 조합이 끝난
   // 뒤의 입력에만 인라인 제안을 적용한다.
   const isComposingRef = useRef(false);
+  // isGhostShown/typedLength의 실시간 사본. 마지막 글자를 쳐서 ghost 제안이
+  // 정확히 완전한 키워드와 일치해 사라지는 순간, 브라우저가 네이티브 select
+  // 이벤트를 input 이벤트와 같은 틱에 동기적으로 발생시킬 수 있는데, 이때
+  // onSelect가 아직 리렌더 전(stale)인 state 클로저를 읽으면 "선택 범위가
+  // ghost 예상과 다르다"고 잘못 판단해 방금 확정된 마지막 글자를 잘라버린다
+  // (예: "useEffect" 완성 직후 "t"만 사라짐). suppressGhostRef와 같은 이유로
+  // state 대신 ref로 최신 값을 동기적으로 유지한다.
+  const isGhostShownRef = useRef(false);
+  const typedLengthRef = useRef<number | null>(null);
 
   const typedText = typedLength === null ? concept : concept.slice(0, typedLength);
   const query = typedText.trim().toLowerCase();
@@ -58,7 +74,20 @@ export function ConceptStep() {
 
   const showSuggestions = isOpen && suggestions.length > 0;
 
+  // 명백히 화이트리스트 범주 안인 개념만 가볍게 알려준다 - 매치 안 된다고
+  // 부적합은 아니므로 부정적/차단 피드백은 여기서 하지 않는다.
+  // - ghost 자동완성으로 아직 확정 안 된 부분은 제외하고, 실제로 타이핑한
+  //   부분(typedText)만 기준으로 판단한다.
+  // - 타이핑 중 매 글자마다 표시가 깜빡이지 않도록 디바운싱한다.
+  const debouncedTypedText = useDebouncedValue(typedText, 300);
+  const debouncedRecognized = useMemo(
+    () => isLocallyRecognized(debouncedTypedText),
+    [debouncedTypedText],
+  );
+
   const clearGhostState = () => {
+    isGhostShownRef.current = false;
+    typedLengthRef.current = null;
     setIsGhostShown(false);
     setTypedLength(null);
   };
@@ -76,9 +105,13 @@ export function ConceptStep() {
   // 기준으로 자르기 때문에, 호출 시점의 현재 선택 범위가 무엇이든(Ctrl+A로
   // 전체가 선택돼 있어도) 항상 정확히 타이핑한 부분만 남는다.
   const rejectGhost = () => {
-    if (typedLength === null) return;
+    // typedLength/concept를 클로저로 읽지 않고 ref + 스토어 getState()로 읽는다
+    // - onSelect 등에서 같은 틱에 연쇄 호출될 때도 항상 최신 값 기준으로 자른다.
+    const currentTypedLength = typedLengthRef.current;
+    if (currentTypedLength === null) return;
     suppressGhostRef.current = true;
-    setConcept(concept.slice(0, typedLength));
+    const currentConcept = usePromptBuilderStore.getState().concept;
+    setConcept(currentConcept.slice(0, currentTypedLength));
     clearGhostState();
   };
 
@@ -105,6 +138,8 @@ export function ConceptStep() {
       // 이미 일치한다고 보고 선택 영역을 건드리지 않는다.
       input.value = match;
       input.setSelectionRange(rawValue.length, match.length);
+      isGhostShownRef.current = true;
+      typedLengthRef.current = rawValue.length;
       setConcept(match);
       setTypedLength(rawValue.length);
       setIsGhostShown(true);
@@ -244,10 +279,33 @@ export function ConceptStep() {
               // 선택 범위가 "인라인 제안이라면 당연히 이래야 할 범위"
               // (typedLength ~ concept 끝)와 실제로 일치하는지를 매번
               // 다시 계산해서 비교한다.
-              if (!isGhostShown || typedLength === null) return;
+              // isGhostShown/typedLength/concept를 그대로 읽지 않고 ref +
+              // 스토어 getState()로 읽는다 - 마지막 글자로 ghost가 막 사라진
+              // 직후(onChange가 clearGhostState를 부른 바로 다음) 브라우저가
+              // 같은 틱에 select를 동기 발생시키면, 아직 리렌더 전이라 이
+              // 클로저의 state는 리렌더 전 값을 그대로 들고 있다(stale) -
+              // 그 값으로 판단하면 이미 확정된 마지막 글자를 잘못 잘라낸다.
+              if (!isGhostShownRef.current || typedLengthRef.current === null) return;
               const input = event.currentTarget;
+              const currentConcept = usePromptBuilderStore.getState().concept;
+
+              // ghost로 채워진 문자열의 마지막 글자까지 그대로 타이핑하면, 브라우저가
+              // 선택 영역 전체를 소비하며 커서를 문자열 끝으로 collapse한다. 이건
+              // "다른 방식으로 선택을 바꿈(거절)"이 아니라 "ghost 전체를 타이핑해서
+              // 확정함"이다(Tab으로 확정하는 것과 동일) - 잘라내지 않고 그대로
+              // 확정 처리한다. 이 케이스를 놓치면 완전히 일치하는 단어를 끝까지
+              // 직접 타이핑했을 때 마지막 글자가 사라진다.
+              const isCollapsedAtEnd =
+                input.selectionStart === currentConcept.length &&
+                input.selectionEnd === currentConcept.length;
+              if (isCollapsedAtEnd) {
+                clearGhostState();
+                return;
+              }
+
               const isExpectedGhostRange =
-                input.selectionStart === typedLength && input.selectionEnd === concept.length;
+                input.selectionStart === typedLengthRef.current &&
+                input.selectionEnd === currentConcept.length;
               if (!isExpectedGhostRange) {
                 rejectGhost();
               }
@@ -306,6 +364,27 @@ export function ConceptStep() {
           </ul>
         )}
       </div>
+      {conceptCheckStatus === "invalid" && conceptCheckReason ? (
+        <p className="text-amber-500 font-mono text-xs">{conceptCheckReason}</p>
+      ) : conceptCheckStatus === "checking" ? (
+        <p className="text-faint font-mono text-xs">확인하는 중...</p>
+      ) : conceptSuggestion ? (
+        <p className="font-mono text-xs">
+          <span className="text-amber-500">혹시 </span>
+          <button
+            type="button"
+            onClick={() => setConcept(conceptSuggestion)}
+            className="text-primary cursor-pointer underline underline-offset-2"
+          >
+            {conceptSuggestion}
+          </button>
+          <span className="text-amber-500">
+            {"을(를) 말씀하신 건가요? 맞으면 눌러서 적용해주세요."}
+          </span>
+        </p>
+      ) : debouncedRecognized ? (
+        <p className="text-faint font-mono text-xs">✓ 프론트엔드 개념으로 인식했어요</p>
+      ) : null}
     </div>
   );
 }
