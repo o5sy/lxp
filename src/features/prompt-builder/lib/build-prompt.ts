@@ -15,7 +15,7 @@ const SYSTEM_PROMPT = `당신은 PCM-L(Layered Competency Mentoring) 방법론�
 
 규칙:
 - 가장 먼저 판별 순서를 지킨다:
-  1. 학습자가 입력한 텍스트가 오타나 축약형처럼 보이지만 실존하는 프론트엔드 개념/라이브러리 API를 가리키는 게 명백하면(예: "useSuspenseQuer" → TanStack Query의 "useSuspenseQuery", "useStat" → React의 "useState"), suggestedCorrection에 정확한 전체 이름을 적는다. 이 경우 reason은 빈 문자열로, instruction/starterCode는 채우지 않는다. status는 형식상 invalid로 둔다. **오타/축약형이 아니라 단순히 화이트리스트에 없는 새로운 개념(예: "웹 접근성")이면 suggestedCorrection을 채우지 않는다** — 이미 정확한 이름을 오타로 취급하지 않는다.
+  1. 학습자가 입력한 텍스트가 오타나 축약형처럼 보이지만 실존하는 프론트엔드 개념/라이브러리 API를 가리키는 게 명백하면(예: "useSuspenseQuer" → TanStack Query의 "useSuspenseQuery", "useStat" → React의 "useState"), suggestedCorrection에 정확한 전체 이름을 적는다. 이 경우 reason은 빈 문자열로, instruction/starterCode는 채우지 않는다. status는 형식상 invalid로 둔다. **오타/축약형이 아니라 단순히 화이트리스트에 없는 새로운 개념(예: "웹 접근성")이면 suggestedCorrection을 채우지 않는다** — 이미 정확한 이름을 오타로 취급하지 않는다. **학습자가 입력한 텍스트가 이미 정확한 전체 이름과 완전히 같다면(대소문자 차이만 있어도) suggestedCorrection을 절대 채우지 않는다 — 자기 자신을 제안하지 않는다.** 이 경우 바로 2번 단계로 넘어가 valid로 판정한다.
   2. suggestedCorrection이 해당하지 않으면 status를 판별한다: 학습자가 입력한 개념이 "프론트엔드 코딩 실습"(브라우저에서 실행되는 React 컴포넌트로 표현 가능한 개념)으로 옮길 수 있으면 valid, 옮길 수 없으면 invalid로 판정한다.
      - invalid 예시: "하네스 엔지니어링"처럼 코드 실습으로 표현할 수 없는 개념, 무의미한 문자열, 프론트엔드와 무관한 다른 직군 개념(예: 회계, 용접, 인사 관리).
      - 애매하더라도 조금이라도 프론트엔드 코딩 실습으로 만들 여지가 있으면 valid로 판정하고 최선을 다해 실습을 설계한다 — invalid는 정말 코드로 옮길 수 없을 때만 쓴다.
@@ -46,7 +46,7 @@ const CONCEPT_CHECK_SYSTEM_PROMPT = `당신은 PCM-L(Layered Competency Mentorin
 
 규칙:
 - 판별 순서를 지킨다:
-  1. 학습자가 입력한 텍스트가 오타나 축약형처럼 보이지만 실존하는 프론트엔드 개념/라이브러리 API를 가리키는 게 명백하면(예: "useSuspenseQuer" → TanStack Query의 "useSuspenseQuery", "useStat" → React의 "useState"), suggestedCorrection에 정확한 전체 이름을 적는다. 이 경우 reason은 빈 문자열로 둔다. status는 형식상 invalid로 둔다. 오타/축약형이 아니라 단순히 화이트리스트에 없는 새로운 개념(예: "웹 접근성")이면 suggestedCorrection을 채우지 않는다 — 이미 정확한 이름을 오타로 취급하지 않는다.
+  1. 학습자가 입력한 텍스트가 오타나 축약형처럼 보이지만 실존하는 프론트엔드 개념/라이브러리 API를 가리키는 게 명백하면(예: "useSuspenseQuer" → TanStack Query의 "useSuspenseQuery", "useStat" → React의 "useState"), suggestedCorrection에 정확한 전체 이름을 적는다. 이 경우 reason은 빈 문자열로 둔다. status는 형식상 invalid로 둔다. 오타/축약형이 아니라 단순히 화이트리스트에 없는 새로운 개념(예: "웹 접근성")이면 suggestedCorrection을 채우지 않는다 — 이미 정확한 이름을 오타로 취급하지 않는다. **학습자가 입력한 텍스트가 이미 정확한 전체 이름과 완전히 같다면(대소문자 차이만 있어도) suggestedCorrection을 절대 채우지 않는다 — 자기 자신을 제안하지 않는다.** 이 경우 바로 2번 단계로 넘어가 valid로 판정한다.
   2. suggestedCorrection이 해당하지 않으면 status를 판별한다: 학습자가 입력한 개념이 "프론트엔드 코딩 실습"(브라우저에서 실행되는 React 컴포넌트로 표현 가능한 개념)으로 옮길 수 있으면 valid, 옮길 수 없으면 invalid로 판정한다.
      - invalid 예시: "하네스 엔지니어링"처럼 코드 실습으로 표현할 수 없는 개념, 무의미한 문자열, 프론트엔드와 무관한 다른 직군 개념(예: 회계, 용접, 인사 관리).
      - 애매하더라도 조금이라도 프론트엔드 코딩 실습으로 만들 여지가 있으면 valid로 판정한다 — invalid는 정말 코드로 옮길 수 없을 때만 쓴다.

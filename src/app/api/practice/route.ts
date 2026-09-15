@@ -11,6 +11,16 @@ function sseEvent(event: string, data: string) {
   return `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
 }
 
+// 모델이 이미 정확한 입력을 "자기 자신"으로 제안하는 경우가 있다(예: 이미 정확한
+// "useSuspenseQuery"를 입력했는데 suggestedCorrection에 똑같이 "useSuspenseQuery"를
+// 채움). 이런 무의미한 제안을 보정 제안으로 취급하면, 사용자가 제안을 눌러도 값이
+// 그대로라 화면이 진행 안 되는 것처럼 보인다 - 실제로 다른 값을 제안할 때만 인정한다.
+function isRealSuggestion(suggestion: string | undefined, original: string): suggestion is string {
+  if (!suggestion) return false;
+  const normalize = (value: string) => value.trim().toLowerCase().replace(/\s+/g, "");
+  return normalize(suggestion) !== normalize(original);
+}
+
 function toFriendlyErrorMessage(error: unknown): string {
   const message = error instanceof Error ? error.message : "";
 
@@ -53,9 +63,14 @@ export async function POST(request: Request) {
             system,
             prompt,
           });
-          if (final.suggestedCorrection) {
+          if (isRealSuggestion(final.suggestedCorrection, input.concept)) {
             // 오타/축약형으로 보이는 경우 - 거부가 아니라 정확한 이름을 제안한다.
             controller.enqueue(encoder.encode(sseEvent("suggestion", final.suggestedCorrection)));
+          } else if (final.suggestedCorrection) {
+            // 모델이 입력과 똑같은 값을 "제안"으로 준 경우 - 실질적으로는 유효하다는
+            // 뜻이므로 그대로 통과시킨다(reason이 비어있을 수 있어 rejected로
+            // 보내면 빈 메시지만 뜬다).
+            controller.enqueue(encoder.encode(sseEvent("done", "")));
           } else if (final.status === "invalid" && !locallyRecognized) {
             controller.enqueue(
               encoder.encode(sseEvent("rejected", final.reason || "이 개념은 코드 실습으로 만들기 어려워요.")),
@@ -89,9 +104,9 @@ export async function POST(request: Request) {
           const final = await result.object;
           const rejected = final.status === "invalid" && !locallyRecognized;
 
-          if (final.suggestedCorrection) {
+          if (isRealSuggestion(final.suggestedCorrection, input.concept)) {
             controller.enqueue(encoder.encode(sseEvent("suggestion", final.suggestedCorrection)));
-          } else if (rejected) {
+          } else if (rejected && !final.suggestedCorrection) {
             controller.enqueue(
               encoder.encode(sseEvent("rejected", final.reason || "이 개념은 코드 실습으로 만들기 어려워요.")),
             );
