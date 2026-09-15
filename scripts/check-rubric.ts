@@ -39,7 +39,9 @@ async function main() {
     const results = runRubric(sample);
     const failed = results.filter((r) => !r.pass);
 
-    console.log(`\n=== ${file} (${sample.input.concept} / ${sample.input.difficulty}) ===`);
+    console.log(
+      `\n=== ${file} (${sample.input.concept} / ${sample.input.difficulty} / status=${sample.output.status}) ===`,
+    );
     if (failed.length === 0) {
       console.log("  모든 규칙 통과");
     } else {

@@ -46,6 +46,9 @@ async function captureOne(input: PracticeGenerationInput) {
   return {
     input,
     output: {
+      status: object.status,
+      reason: object.reason,
+      suggestedCorrection: object.suggestedCorrection,
       instruction: object.instruction,
       starterCode: object.starterCode,
     },

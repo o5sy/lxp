@@ -5,9 +5,10 @@
     "freeText": ""
   },
   "output": {
-    "instruction": "클로저는 외부 함수의 변수에 접근할 수 있는 내부 함수와 그 환경의 조합입니다.\n\n외부 함수의 실행이 종료되어도 내부 함수는 자신이 생성될 때 상위 스코프에 있던 변수의 상태를 기억하고 참조할 수 있습니다.\n\n이번 실습에서는 상태를 기억하고 증가시키는 클로저 함수를 직접 작성하며 기본 문법과 동작 원리를 익힙니다.\n\n## 실습 목표\n- 외부 변수 스코프를 기억하는 클로저 함수 작성법을 연습합니다.\n- 생성 시점에 따라 각 클로저가 서로 독립된 상태 변수를 가짐을 확인합니다.\n\n## 요구 사항\n- `createCounter(initialCount)` 함수를 완성하세요.\n- 함수 내부에서 `initialCount`를 초기값으로 갖는 변수 `count`를 선언하세요.\n- 호출될 때마다 `count`를 `1` 증가시키고, 증가된 `count` 값을 반환하는 내부 함수를 `return` 하세요.\n\n## 완료 기준\n- '카운터 1 증가' 버튼을 누르면 카운터 1의 값이 `1`, `2`, `3`으로 1씩 증가합니다.\n- '카운터 2 증가' 버튼을 누르면 카운터 2의 값이 `11`, `12`, `13`으로 1씩 증가하며, 카운터 1에 영향을 주지 않습니다.",
-    "starterCode": "import React, { useState } from 'react';\n\n// TODO: 클로저를 형성하는 createCounter 함수를 완성하세요.\nfunction createCounter(initialCount) {\n  // 1. initialCount를 초기값으로 갖는 변수 count를 선언하세요.\n  \n  // 2. 호출될 때마다 count를 1 증가시키고 그 값을 반환하는 함수를 반환하세요.\n  \n}\n\n// 함수 생성 시점의 독립된 스코프 환경을 테스트하기 위한 인스턴스 생성\nconst counter1 = createCounter(0);\nconst counter2 = createCounter(10);\n\nexport default function App() {\n  const [val1, setVal1] = useState(0);\n  const [val2, setVal2] = useState(10);\n\n  const handleIncrement1 = () => {\n    if (typeof counter1 === 'function') {\n      setVal1(counter1());\n    }\n  };\n\n  const handleIncrement2 = () => {\n    if (typeof counter2 === 'function') {\n      setVal2(counter2());\n    }\n  };\n\n  return (\n    <div style={{ padding: '20px', fontFamily: 'sans-serif' }}>\n      <h2>클로저 실습: 독립된 카운터</h2>\n      \n      <div style={{ marginBottom: '16px', padding: '12px', border: '1px solid #ddd', borderRadius: '4px' }}>\n        <p>카운터 1 (초기값 0): <strong>{val1}</strong></p>\n        <button onClick={handleIncrement1}>카운터 1 증가</button>\n      </div>\n\n      <div style={{ padding: '12px', border: '1px solid #ddd', borderRadius: '4px' }}>\n        <p>카운터 2 (초기값 10): <strong>{val2}</strong></p>\n        <button onClick={handleIncrement2}>카운터 2 증가</button>\n      </div>\n    </div>\n  );\n}"
+    "status": "valid",
+    "reason": "",
+    "suggestedCorrection": "클로저 (Closure) 개념은 정확히 입력되었습니다. 바로 실습을 진행합니다."
   },
   "model": "gemini-3.6-flash",
-  "capturedAt": "2026-09-11T11:06:18.994Z"
+  "capturedAt": "2026-09-15T11:24:35.772Z"
 }
