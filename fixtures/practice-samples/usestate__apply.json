@@ -1,0 +1,16 @@
+{
+  "input": {
+    "concept": "useState",
+    "difficulty": "apply",
+    "freeText": ""
+  },
+  "output": {
+    "status": "valid",
+    "reason": "",
+    "suggestedCorrection": "",
+    "instruction": "사용자 인터랙션에 따라 화면의 데이터가 동적으로 변경되는 UI를 구축하기 위해서는 컴포넌트 내 상태 관리가 필수적입니다.\n\n이 실습에서는 사용자 입력과 선택에 따라 결제 금액이 실시간으로 계산되고 화면에 반영되는 상품 주문 컴포넌트를 구현합니다.\n\n요구되는 화면 변화를 파악하고 필요한 상태 변수를 직접 정의하여 동적인 유저 인터페이스를 완성해 보세요.\n\n## 실습 목표\n- 화면 변경을 유발하는 데이터를 식별하고 필요한 상태를 스스로 정의할 수 있습니다.\n- 사용자 이벤트(클릭, 입력) 발생 시 상태를 업데이트하고 화면에 즉시 반영할 수 있습니다.\n\n## 요구 사항\n- 수량 변경 기능: '+' 버튼 클릭 시 수량이 1 증가하고, '-' 버튼 클릭 시 수량이 1 감소합니다. 단, 수량은 1 미만으로 내려가지 않아야 합니다.\n- 쿠폰 적용 기능: '3,000원 할인 쿠폰 적용' 체크박스를 선택하면 총 결제 금액에서 3,000원이 할인되고, 해제하면 할인이 취소되어야 합니다.\n- 금액 계산: 기본 상품 가격은 10,000원입니다. (총 금액 = 수량 * 10,000원 - 할인 금액). 단, 할인 금액 적용 후 금액이 0원 미만이 되는 경우 0원으로 표시합니다.\n\n## 완료 기준\n- '+' 버튼을 눌렀을 때 화면의 수량이 증가하고 총 결제 금액이 10,000원 단위로 증가하는지 확인합니다.\n- 수량이 1일 때 '-' 버튼을 눌러도 수량이 1 미만으로 감소하지 않는지 확인합니다.\n- 쿠폰 체크박스를 선택하거나 해제할 때 총 결제 금액에 3,000원 할인이 정상적으로 반영되는지 확인합니다.",
+    "starterCode": "import React from 'react';\n\nexport default function App() {\n  // TODO: 필요한 상태(State)를 선언해보세요.\n\n  const PRICE_PER_ITEM = 10000;\n  const DISCOUNT_AMOUNT = 3000;\n\n  return (\n    <div style={{ padding: '20px', fontFamily: 'sans-serif', maxWidth: '400px' }}>\n      <h2>🛒 상품 주문하기</h2>\n      \n      <div style={{ border: '1px solid #ccc', padding: '15px', borderRadius: '8px' }}>\n        <h3>베이직 T-셔츠</h3>\n        <p>가격: {PRICE_PER_ITEM.toLocaleString()}원</p>\n        \n        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '15px' }}>\n          <span>수량:</span>\n          <button style={{ width: '30px', height: '30px' }}>-</button>\n          <span style={{ fontWeight: 'bold' }}>1</span>\n          <button style={{ width: '30px', height: '30px' }}>+</button>\n        </div>\n\n        <div style={{ marginBottom: '15px' }}>\n          <label style={{ cursor: 'pointer' }}>\n            <input type=\"checkbox\" /> 3,000원 할인 쿠폰 적용\n          </label>\n        </div>\n\n        <hr />\n        \n        <div style={{ marginTop: '15px' }}>\n          <h4>총 결제 금액: 10,000원</h4>\n        </div>\n      </div>\n    </div>\n  );\n}"
+  },
+  "model": "gemini-3.6-flash",
+  "capturedAt": "2026-09-15T11:47:44.444Z"
+}

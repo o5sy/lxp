@@ -1,0 +1,16 @@
+{
+  "input": {
+    "concept": "CSS flexbox",
+    "difficulty": "stretch",
+    "freeText": ""
+  },
+  "output": {
+    "status": "valid",
+    "reason": "",
+    "suggestedCorrection": "",
+    "instruction": "CSS Flexbox는 웹 요소를 1차원(행 또는 열)으로 유연하게 배치하고 정렬할 수 있게 해주는 핵심 레이아웃 모델입니다.\n\n다양한 화면 크기에서도 요소들의 크기와 간격을 비율에 맞게 조절하고, 복잡한 카드 레이아웃이나 정렬을 간결한 속성으로 해결할 수 있습니다.\n\n이번 실습에서는 실제 웹 서비스의 대시보드 프로필 및 반응형 카드 리스트 레이아웃을 Flexbox 종합 속성을 활용하여 완성해 봅니다.\n\n## 실습 목표\n\n- `display: flex`, `flex-direction`, `flex-wrap` 속성을 이용해 유연한 레이아웃 구조를 설계할 수 있습니다.\n- `justify-content`, `align-items`, `gap`을 활용해 요소 간의 간격과 정렬을 자유롭게 제어할 수 있습니다.\n- `flex-grow`, `flex-shrink`, `flex-basis` 축약형 속성을 사용해 가변적이고 균형 잡힌 카드 컴포넌트를 구현할 수 있습니다.\n\n## 요구 사항\n\n- **상단 헤더 (`.header`)**:\n  - 주 축 방향을 수평으로 설정하고, 내부 요소(`로고`, `검색창 영역`, `내 정보`)가 양 끝과 중앙에 균등 배치되도록 정렬하세요.\n  - 검색창 영역(`.search-bar`)은 남아있는 남은 공간을 모두 차지하도록 확장 제어 속성을 적용하세요.\n- **대시보드 메인 레이아웃 (`.dashboard-container`)**:\n  - 사이드바(`.sidebar`)와 메인 콘텐츠(`.main-content`)를 수평 배치하세요.\n  - 사이드바는 화면 크기가 줄어들어도 너비가 `200px` 미만으로 줄어들지 않도록 축소 방지 설정을 적용하세요.\n- **카드 리스트 (`.card-list`)**:\n  - 여러 개의 카드가 가로로 나열되다가 공간이 부족해지면 자동으로 다음 줄로 넘어가도록 처리하세요.\n  - 카드들 사이에 `16px` 간격을 지정하세요.\n- **카드 컴포넌트 (`.card`)**:\n  - 기본 너비를 `220px`로 설정하되, 공간이 남으면 균등한 비율로 늘어나도록 설정하세요.\n  - 카드 내부 배치는 세로 방향(열)으로 정렬하고, 제목과 본문은 상단에, 버튼은 카드 최하단에 붙도록 정렬하세요.\n\n## 완료 기준\n\n- 헤더 내의 검색창 영역이 로고와 내 정보 사이의 남아있는 공간을 가득 채우고 있는지 확인합니다.\n- 카드 리스트에 카드가 여러 개 추가되거나 화면 너비가 변경될 때, 카드가 다음 줄로 자연스럽게 개행되는지 확인합니다.\n- 모든 카드가 동일한 높이를 유지하면서 내부의 '자세히 보기' 버튼이 항상 카드의 맨 아래쪽에 위치하는지 확인합니다.",
+    "starterCode": "import React from 'react';\nimport './style.css';\n\nexport default function App() {\n  return (\n    <div className=\"app\">\n      {/* 상단 헤더 */}\n      <header className=\"header\">\n        <div className=\"logo\">Dashboard</div>\n        <div className=\"search-bar\">\n          <input type=\"text\" placeholder=\"검색어를 입력하세요...\" />\n        </div>\n        <div className=\"profile\">내 정보</div>\n      </header>\n\n      {/* 메인 대시보드 영역 */}\n      <div className=\"dashboard-container\">\n        {/* 사이드바 */}\n        <aside className=\"sidebar\">\n          <ul>\n            <li>홈</li>\n            <li>통계</li>\n            <li>설정</li>\n          </ul>\n        </aside>\n\n        {/* 메인 콘텐츠 */}\n        <main className=\"main-content\">\n          <h2>프로젝트 현황</h2>\n          <div className=\"card-list\">\n            <div className=\"card\">\n              <h3>프로젝트 A</h3>\n              <p>진행률 80%의 프론트엔드 대시보드 개발 건입니다.</p>\n              <button>자세히 보기</button>\n            </div>\n            <div className=\"card\">\n              <h3>프로젝트 B</h3>\n              <p>백엔드 API 연동 및 성능 최적화 작업입니다. 사소한 이슈 해결 중입니다.</p>\n              <button>자세히 보기</button>\n            </div>\n            <div className=\"card\">\n              <h3>프로젝트 C</h3>\n              <p>디자인 시스템 구축 및 신규 UI 컴포넌트 추가 작업입니다.</p>\n              <button>자세히 보기</button>\n            </div>\n            <div className=\"card\">\n              <h3>프로젝트 D</h3>\n              <p>QA 및 배포 자동화 파이프라인 구성 작업입니다.</p>\n              <button>자세히 보기</button>\n            </div>\n          </div>\n        </main>\n      </div>\n    </div>\n  );\n}\n"
+  },
+  "model": "gemini-3.6-flash",
+  "capturedAt": "2026-09-15T11:49:54.508Z"
+}
