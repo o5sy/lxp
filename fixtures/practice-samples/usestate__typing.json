@@ -1,0 +1,14 @@
+{
+  "input": {
+    "concept": "useState",
+    "difficulty": "typing",
+    "freeText": ""
+  },
+  "output": {
+    "status": "valid",
+    "reason": "",
+    "suggestedCorrection": "useState복사할 텍스트 없음(비워둠 - 이미 정확함 - 실제로 빈 문자열 처리 필요) -> 이미 완벽함. 빈 문자열로 처리 무방. 최종적으로 \"\" 처리."
+  },
+  "model": "gemini-3.6-flash",
+  "capturedAt": "2026-09-15T11:24:27.982Z"
+}

@@ -1,0 +1,16 @@
+{
+  "input": {
+    "concept": "클로저",
+    "difficulty": "apply",
+    "freeText": ""
+  },
+  "output": {
+    "status": "valid",
+    "reason": "",
+    "suggestedCorrection": "",
+    "instruction": "자바스크립트의 상태 유지 및 캡슐화 패턴을 다루는 실습입니다.\n\n외부 변수에 접근하여 내부 상태를 유지하고, 함수 호출 간에 데이터 연속성을 보장하는 구조를 구현합니다.\n\n요구사항을 바탕으로 독립된 상태를 유지하는 함수 생성기를 작성하고 UI와 연결해보세요.\n\n## 실습 목표\n- 독립적인 상태를 유지하는 고유한 함수를 생성하는 패턴을 이해하고 적용할 수 있다.\n- 전역 변수 오염 없이 각각의 카운터가 독자적인 숫자를 유지하도록 구현할 수 있다.\n\n## 요구 사항\n- `createCounter` 함수를 완성하세요.\n- `createCounter` 함수는 초기 숫자(`initialValue`)를 전달받아, 호출될 때마다 숫자가 1씩 증가된 값을 반환하는 내부 함수를 완성해야 합니다.\n- 반환되는 함수는 외부로 노출되지 않는 고유한 내부 상태 값을 유지해야 합니다.\n\n## 완료 기준\n- '카운터 A 초기화/생성' 버튼을 누른 후 '카운터 A 증가' 버튼을 누르면 숫자가 1, 2, 3...으로 1씩 증가하는지 확인합니다.\n- '카운터 B 초기화/생성' 버튼을 누른 후 '카운터 B 증가' 버튼을 누르면 숫자가 11, 12, 13...으로 1씩 증가하는지 확인합니다.\n- A와 B 카운터를 번갈아 눌러도 각 카운터의 숫자가 서로 영향을 주지 않고 독립적으로 유지되는지 확인합니다.",
+    "starterCode": "import React, { useState } from 'react';\n\n// TODO: 내부 상태를 유지하고 호출될 때마다 1씩 증가된 값을 반환하는 함수를 반환하세요.\nfunction createCounter(initialValue = 0) {\n  // 코드를 작성하세요.\n}\n\nexport default function App() {\n  const [counterA, setCounterA] = useState(null);\n  const [counterB, setCounterB] = useState(null);\n  const [countA, setCountA] = useState(0);\n  const [countB, setCountB] = useState(10);\n\n  const handleInitA = () => {\n    const nextCounter = createCounter(0);\n    setCounterA(() => nextCounter);\n    setCountA(0);\n  };\n\n  const handleInitB = () => {\n    const nextCounter = createCounter(10);\n    setCounterB(() => nextCounter);\n    setCountB(10);\n  };\n\n  const handleIncrementA = () => {\n    if (counterA) {\n      setCountA(counterA());\n    }\n  };\n\n  const handleIncrementB = () => {\n    if (counterB) {\n      setCountB(counterB());\n    }\n  };\n\n  return (\n    <div style={{ padding: '20px', fontFamily: 'sans-serif' }}>\n      <h2>독립 상태 생성기</h2>\n      \n      <div style={{ marginBottom: '20px', padding: '15px', border: '1px solid #ccc', borderRadius: '8px' }}>\n        <h3>카운터 A (시작값: 0)</h3>\n        <button onClick={handleInitA}>카운터 A 초기화/생성</button>\n        {counterA && (\n          <div style={{ marginTop: '10px' }}>\n            <p>현재 값: <strong>{countA}</strong></p>\n            <button onClick={handleIncrementA}>카운터 A 증가</button>\n          </div>\n        )}\n      </div>\n\n      <div style={{ padding: '15px', border: '1px solid #ccc', borderRadius: '8px' }}>\n        <h3>카운터 B (시작값: 10)</h3>\n        <button onClick={handleInitB}>카운터 B 초기화/생성</button>\n        {counterB && (\n          <div style={{ marginTop: '10px' }}>\n            <p>현재 값: <strong>{countB}</strong></p>\n            <button onClick={handleIncrementB}>카운터 B 증가</button>\n          </div>\n        )}\n      </div>\n    </div>\n  );\n}"
+  },
+  "model": "gemini-3.6-flash",
+  "capturedAt": "2026-09-15T11:48:00.376Z"
+}

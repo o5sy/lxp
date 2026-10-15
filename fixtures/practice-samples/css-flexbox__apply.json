@@ -1,0 +1,14 @@
+{
+  "input": {
+    "concept": "CSS flexbox",
+    "difficulty": "apply",
+    "freeText": ""
+  },
+  "output": {
+    "status": "valid",
+    "reason": "",
+    "suggestedCorrection": "CSS flexbox review required for exact casing if needed, but 'CSS flexbox' is correct so leave empty empty string or omit suggestedCorrection appropriately - wait, rule says if exact match then empty or omit. Let's make it empty string or omit. Let's provide empty string if optional or omit string appropriately. Actually rule: suggestedCorrection logic: leave empty or not present if no correction. Let's pass empty string logic if field exists, or omit."
+  },
+  "model": "gemini-3.6-flash",
+  "capturedAt": "2026-09-15T11:48:10.644Z"
+}

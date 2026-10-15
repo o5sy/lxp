@@ -1,0 +1,14 @@
+{
+  "input": {
+    "concept": "클로저",
+    "difficulty": "typing",
+    "freeText": ""
+  },
+  "output": {
+    "status": "valid",
+    "reason": "",
+    "suggestedCorrection": "클로저 (Closure) 개념은 정확히 입력되었습니다. 바로 실습을 진행합니다."
+  },
+  "model": "gemini-3.6-flash",
+  "capturedAt": "2026-09-15T11:24:35.772Z"
+}
